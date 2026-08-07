@@ -1,0 +1,1 @@
+[30-Apr-2026 15:06:17 Asia/Kolkata] PHP Fatal error:  Cannot redeclare App\Http\Controllers\API\AuthController::fcmVersionUpdate() in /home/dev8codebuzzers/public_html/healinghub/app/Http/Controllers/API/AuthController.php on line 160

@@ -1,0 +1,36 @@
+.box {
+    margin-bottom: 20px;
+}
+.healbreadcrumb {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+#productImagePreview {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 10px;
+}
+.image-wrapper {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.image-wrapper img {
+   max-width: 70px;
+   border-radius: 8px;
+   display: block;
+}
+.delete-icon {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    background: rgb(241 9 82 / 60%);
+    color: #fff;
+    padding: 2px 6px; 
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 70%;
+}

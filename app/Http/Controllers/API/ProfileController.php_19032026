@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+// use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\BaseController;
+use Illuminate\Http\Request;
+
+use App\Helpers\CustomHelper;
+
+use App\Models\UserDetail;
+use App\Models\Category;
+
+use Auth;
+class ProfileController extends BaseController
+{
+    public function myProfile()
+    {
+        $user = Auth::user();
+        $user_id = $user->id;
+        $details = UserDetail::with(['category'=>function($qry){
+                                $qry->select('id','name');
+                            }])->where('user_id',$user_id)->first();
+        $categories = [];
+        if($user->role=='doctor'){
+            $categories = Category::select('id','name')->whereIn('id',[1,2])->get();
+        }
+        $result = [
+            'user' => $user,
+            'details' => $details,
+            'categories' => $categories
+        ];
+        return $this->sendResponse($result, 'Successfull');
+    }
+    public function profileUpdate(Request $request)
+    {
+        $user_id = Auth::id();
+        $user = User::find($id);
+        $role = $user->role;
+        if($role=='customer'){
+            $rules = [
+                'name' => 'required|min:3',
+                'gender' => 'required|in:Male,Female',
+                'age' => 'required|numeric|min:0.1|max:150',
+                'weight' => 'required|numeric|min:1|max:150',
+                'heart_rate' => 'nullable',
+                'bp' => 'nullable',
+                'calories' => 'nullable',
+                'image' => 'nullable|file|mimes:jpeg,jpg,png,webp,gif'
+            ];
+        }else{
+            $rules = [
+                'name' => 'required|min:3',
+                'category_id' => 'required|in:1,2',
+                'bank_name' => 'nullable|required_with:bank_ifsc_code,bank_acc_no',
+                'bank_acc_no' => 'nullable|required_with:bank_name,bank_ifsc_code',
+                'bank_ifsc_code' => 'nullable|required_with:bank_name,bank_acc_no',
+                'image' => 'nullable|file|mimes:jpeg,jpg,png,webp,gif'
+            ];
+        }
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->passes()) {
+            $user->name = $request->name;
+            $user->save();
+            
+            $details = UserDetail::where('user_id',$user_id)->first();
+            if($role=='doctor'){
+                $details->category_id = $request->category_id;
+                $details->specialist = $request->specialist;
+                $details->bank_name = $request->bank_name;
+                $details->bank_acc_no = $request->bank_acc_no;
+                $details->bank_ifsc_code = $request->bank_ifsc_code;
+                $details->upi = $request->upi;
+                $details->about = $request->about;
+                if($request->hasFile('image')){
+                    if($details->image){
+                        CustomHelper::removeExistingFileFromStorage($details->image);//This is a helper function
+                    }
+                    $details->image = $request->image->store('user','public');
+                }
+            }else{
+                $details->gender = $request->gender;
+                $details->age = $request->age;
+                $details->weight = $request->weight;
+                $details->heart_rate = $request->heart_rate;
+                $details->bp = $request->bp;
+                $details->calories = $request->calories;
+            }
+            $details->save();
+
+            return $this->sendResponse([], "Successfull");
+        }else{
+            return $this->sendError($validator->errors()->first());
+        }
+    }
+}

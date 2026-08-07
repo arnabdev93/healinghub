@@ -1,0 +1,2712 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "HealingHub API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/healinghub/api/app-settings": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Get App Settings",
+                "description": "Retrieve application settings",
+                "operationId": "19dbb364f19e586a25e8aa8acd62350a",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Success message",
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "description": "App settings data",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/send-otp": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Send OTP",
+                "operationId": "d868329aa9657825408b483b7b3e0e65",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mobile"
+                                ],
+                                "properties": {
+                                    "mobile": {
+                                        "description": "Customer mobile number",
+                                        "type": "string",
+                                        "example": "7890026841"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent successfully to your mobile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "OTP sent successfully"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/otp-verify": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "OTP Verification",
+                "operationId": "ede40d5e1bcc9eaf7c3ef42f64c01a71",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mobile",
+                                    "otp",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "mobile": {
+                                        "description": "Customer mobile number",
+                                        "type": "string",
+                                        "example": "7890026841"
+                                    },
+                                    "otp": {
+                                        "description": "OTP received on mobile",
+                                        "type": "string",
+                                        "example": "1111"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP Verified Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "OTP verified successfully"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/sign-up": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Customer Registration",
+                "operationId": "b778ea4b549bc4ee9930bc0ab028a266",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mobile",
+                                    "name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "mobile": {
+                                        "type": "string",
+                                        "example": "7890026841"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jawed Afteab"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "jawed@cb.com"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "Male/Female"
+                                    },
+                                    "age": {
+                                        "type": "string",
+                                        "example": "35"
+                                    },
+                                    "weight": {
+                                        "type": "string",
+                                        "example": "75"
+                                    },
+                                    "heart_rate": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "bp": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "calories": {
+                                        "type": "string",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Signup Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Signup successfully"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/fcm-version-update": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "FCM token, AppVerion Update",
+                "operationId": "ce55052f48daa7629c52a8851c9eda96",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "fcm_token": {
+                                        "type": "string",
+                                        "example": "jdfhgjdmnbmfkjghkdgkldklsnkdjgkldg"
+                                    },
+                                    "app_version": {
+                                        "type": "string",
+                                        "example": "Android_Customer_1.0"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/notifications": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Notification Lists",
+                "operationId": "c00af9aa2970834e097ecbcb4841f971",
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/meets": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Meet Create API",
+                "operationId": "25a38617d7aa2e5b9b44200414edfde9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Weekly Standup"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Team sync meeting"
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "2025-05-15 10:00:00"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "2025-05-15 11:00:00"
+                                    },
+                                    "attendees": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "tanushriroul95@gmail.com"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent successfully to your mobile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "OTP sent successfully"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/dashboard": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Customer Dashboard",
+                "operationId": "a18e65c1a767cef17e1cc5966d975f2a",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/sub-categories": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Sub Categories",
+                "operationId": "f484d219db69cdf985e602ec06dc54d9",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Parent Category ID",
+                        "style": "form",
+                        "explode": false,
+                        "example": "1"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Search by Sub-Category Name",
+                        "style": "form",
+                        "explode": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/products": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Product Lists",
+                "description": "Get product list with category, subcategory, and search filter",
+                "operationId": "8fefeeb9d63dc108d6ba990088a51c37",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Parent Category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "sub_category_id",
+                        "in": "query",
+                        "description": "Sub Category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search products by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "paracetamol"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of products per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Paracetamol Tablet"
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/storage/product.jpg"
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Short product description..."
+                                                            },
+                                                            "prices": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "product_id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "pack_size": {
+                                                                            "type": "string",
+                                                                            "example": "10 tablets"
+                                                                        },
+                                                                        "price": {
+                                                                            "type": "number",
+                                                                            "example": 100
+                                                                        },
+                                                                        "special_price": {
+                                                                            "type": "number",
+                                                                            "example": 80
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/products/{id}": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Product Details",
+                "operationId": "ca3909b21371eec8b545e7b97fab2d9b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "style": "form",
+                        "explode": false,
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/my-profile": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "My Profile",
+                "operationId": "9187cda38790be346d6567db35ad6ec3",
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/profile-update": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Profile Update",
+                "operationId": "fcef10d7efa92839d0789081f883e694",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "User Name",
+                                        "type": "string",
+                                        "example": "Jawed Aftab"
+                                    },
+                                    "gender": {
+                                        "description": "Male/Female. Required for Customer",
+                                        "type": "string",
+                                        "example": "Male"
+                                    },
+                                    "specialist": {
+                                        "description": "specialist",
+                                        "type": "string",
+                                        "example": "Homeopathy"
+                                    },
+                                    "age": {
+                                        "description": "Age required for Customer",
+                                        "type": "string",
+                                        "example": "34"
+                                    },
+                                    "weight": {
+                                        "description": "Weight required for Customer",
+                                        "type": "string",
+                                        "example": "77"
+                                    },
+                                    "heart_rate": {
+                                        "description": "For Customer Only",
+                                        "type": "string"
+                                    },
+                                    "bp": {
+                                        "description": "For Customer Only",
+                                        "type": "string"
+                                    },
+                                    "calories": {
+                                        "description": "For Customer Only",
+                                        "type": "string"
+                                    },
+                                    "category_id": {
+                                        "description": "1/2 Required for Doctor Only",
+                                        "type": "string",
+                                        "example": "2"
+                                    },
+                                    "bank_name": {
+                                        "description": "For Doctor Only",
+                                        "type": "string"
+                                    },
+                                    "bank_acc_no": {
+                                        "description": "For Doctor Only",
+                                        "type": "string"
+                                    },
+                                    "bank_ifsc_code": {
+                                        "description": "For Doctor Only",
+                                        "type": "string"
+                                    },
+                                    "upi": {
+                                        "description": "For Doctor Only",
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Profile Image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/addresses": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Address Lists",
+                "operationId": "69410ed9dc2b24ddd91670647fdbcb06",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Create Address",
+                "operationId": "05da22223ecc7421d46063a7e4f4aca8",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Street Address"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "Home/Work/Others"
+                                    },
+                                    "building_number": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "receipent_name": {
+                                        "type": "string",
+                                        "example": "Jawed Aftab"
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "example": "7890026841"
+                                    },
+                                    "address_id": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "pincode": {
+                                        "type": "string",
+                                        "example": "700004"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Kolkata"
+                                    },
+                                    "state": {
+                                        "type": "string",
+                                        "example": "West Bengal"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "India"
+                                    },
+                                    "latitude": {
+                                        "type": "string",
+                                        "example": "22.4559104"
+                                    },
+                                    "longitude": {
+                                        "type": "string",
+                                        "example": "88.2737152"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "1"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "address_id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/order": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Cart/Prescription Order List",
+                "operationId": "d842f739f70cfdfa8c90c296548c49c4",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "cart/prescription",
+                        "style": "form",
+                        "explode": false,
+                        "example": "prescription"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Order from Cart",
+                "operationId": "d4e6c06bc0f93aef646c2d116a92ce09",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "address_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "payment_method": {
+                                        "type": "string",
+                                        "example": "upi"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/upload-prescription": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Upload Prescription",
+                "operationId": "uploadPrescription",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "address_id": {
+                                        "description": "Address ID",
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "notes": {
+                                        "description": "Notes regarding Prescription",
+                                        "type": "string",
+                                        "example": "Notes write here"
+                                    },
+                                    "images[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "description": "Prescription Images",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "1"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/cart": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Cart List",
+                "operationId": "763883d8bba5ca996434d68f72d35185",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Update CartItem Quantity",
+                "operationId": "10092a781f92a28f3a4eff65457d0709",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cart_item_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "quantity": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "add/remove"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Add Item to Cart",
+                "operationId": "d0ecc81274e5a2b660f4b6c96c943119",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "product_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "quantity": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "medicine_power": {
+                                        "type": "string",
+                                        "example": "1M"
+                                    },
+                                    "product_price_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/cart/item/{id}": {
+            "delete": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Cart Item Delete",
+                "operationId": "edccaf3163586cc728dda5af2b878edf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Cart Item Id",
+                        "style": "form",
+                        "explode": false,
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Signup Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/get-doctors/{category_id}": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Get Doctors By Category",
+                "description": "Returns list of doctors filtered by category_id",
+                "operationId": "getDoctors",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "path",
+                        "description": "Category ID from categories table",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "doctors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "doctor_id": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "doctor_name": {
+                                                                "type": "string",
+                                                                "example": "Dr. Amit Sharma"
+                                                            },
+                                                            "specialist": {
+                                                                "type": "string",
+                                                                "example": "Cardiologist"
+                                                            },
+                                                            "doctor_image": {
+                                                                "type": "string",
+                                                                "example": "http://yourdomain.com/storage/image.jpg"
+                                                            },
+                                                            "available_weekdays": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string",
+                                                                    "example": "Monday"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid category id."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/show-doctor/{doctor_id}": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Get Doctor Details",
+                "description": "Fetch doctor profile details by doctor_id",
+                "operationId": "showDoctor",
+                "parameters": [
+                    {
+                        "name": "doctor_id",
+                        "in": "path",
+                        "description": "ID of the doctor",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctor details fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Dr. John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "doctor@example.com"
+                                                },
+                                                "mobile": {
+                                                    "type": "string",
+                                                    "example": "9876543210"
+                                                },
+                                                "audio_call_fee": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 500
+                                                },
+                                                "video_call_fee": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 800
+                                                },
+                                                "image": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/storage/doctor.jpg"
+                                                },
+                                                "speciality": {
+                                                    "type": "string",
+                                                    "example": "Cardiologist"
+                                                },
+                                                "about": {
+                                                    "type": "string",
+                                                    "example": "10 years of experience in heart treatments."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid doctor id."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Doctor Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doctor not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healinghub/api/book-appointment": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Book Appointment",
+                "description": "Customer can book an appointment with a doctor",
+                "operationId": "bookAppointment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "doctor_id",
+                                    "booking_date",
+                                    "booking_time",
+                                    "appointment_type"
+                                ],
+                                "properties": {
+                                    "doctor_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "booking_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-03-15"
+                                    },
+                                    "booking_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "14:30"
+                                    },
+                                    "appointment_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "audio",
+                                            "video"
+                                        ],
+                                        "example": "video"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Need consultation for headache"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Appointment booked successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment booked successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Selected time is not available"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/get-avalable-slots": {
+            "post": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Get Doctor Available Slots",
+                "description": "Fetch available booking slots for a doctor by date or weekday name.",
+                "operationId": "4da0c4afe43accfd44e5df516a895d77",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "doctor_id",
+                                    "day"
+                                ],
+                                "properties": {
+                                    "doctor_id": {
+                                        "description": "ID of the doctor",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "day": {
+                                        "description": "Provide either full date (YYYY-MM-DD) or weekday name (e.g. Monday)",
+                                        "type": "string",
+                                        "example": "2026-02-15"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Available slots fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Available slots fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "date": {
+                                                    "type": "string",
+                                                    "example": "2026-02-15",
+                                                    "nullable": true
+                                                },
+                                                "slots": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "time": {
+                                                                "type": "string",
+                                                                "example": "14:00"
+                                                            },
+                                                            "is_available": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "404": {
+                        "description": "Doctor or slots not found"
+                    }
+                }
+            }
+        },
+        "/healinghub/api/cancel-appointment": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Cancel Appointment",
+                "description": "Allows authenticated customer to cancel an appointment if it is not completed and at least 2 hours before start time.",
+                "operationId": "cancelAppointment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "booking_id"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "description": "ID of the booking to cancel",
+                                        "type": "integer",
+                                        "example": 12
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Appointment cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment cancelled successfully."
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation or business logic error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This appointment is already cancelled."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/request-for-price-quote": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Request for Price Quote",
+                "description": "Customer can request a price quote by submitting address, notes and up to 4 images.",
+                "operationId": "requestForPriceQuote",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "address_id",
+                                    "images"
+                                ],
+                                "properties": {
+                                    "address_id": {
+                                        "description": "Existing address ID",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Need urgent service quotation",
+                                        "nullable": true
+                                    },
+                                    "images[]": {
+                                        "description": "Upload up to 4 images (jpeg, png, jpg, max 2MB each)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Price quote request submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Price quote request submitted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The address id field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/create-booking-slot": {
+            "post": {
+                "tags": [
+                    "Doctor API"
+                ],
+                "summary": "Create or update doctor booking slot",
+                "description": "Doctor can create or update weekly booking slots. If weekday already exists, times will be merged.",
+                "operationId": "createBookingSlot",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "weekday",
+                                    "slot_duration",
+                                    "times"
+                                ],
+                                "properties": {
+                                    "weekday": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Sunday",
+                                            "Monday",
+                                            "Tuesday",
+                                            "Wednesday",
+                                            "Thursday",
+                                            "Friday",
+                                            "Saturday"
+                                        ],
+                                        "example": "Monday"
+                                    },
+                                    "slot_duration": {
+                                        "description": "Duration of each slot in minutes",
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "times": {
+                                        "description": "Array of available time slots in H:i format",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "time",
+                                            "example": "14:30"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Slot created or updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfull"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error or unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Only doctors can create booking slots."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/booking-slots": {
+            "get": {
+                "tags": [
+                    "Doctor API"
+                ],
+                "summary": "Get Doctor Booking Slots",
+                "description": "Returns all booking slots for the authenticated doctor",
+                "operationId": "getBookingSlots",
+                "responses": {
+                    "200": {
+                        "description": "Slots fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "slots": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "weekday": {
+                                                                "type": "string",
+                                                                "example": "Monday"
+                                                            },
+                                                            "slot_duration": {
+                                                                "type": "integer",
+                                                                "example": 30
+                                                            },
+                                                            "times": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string",
+                                                                    "example": "10:00"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Only doctors can view booking slots."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/update-booking-slot/{slot_id}": {
+            "post": {
+                "tags": [
+                    "Doctor API"
+                ],
+                "summary": "Update Booking Slot",
+                "description": "Update time slots and slot duration using slot_id",
+                "operationId": "updateBookingSlot",
+                "parameters": [
+                    {
+                        "name": "slot_id",
+                        "in": "path",
+                        "description": "Booking Slot ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "times",
+                                    "slot_duration"
+                                ],
+                                "properties": {
+                                    "times": {
+                                        "description": "List of time slots in H:i format",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "10:00"
+                                        }
+                                    },
+                                    "slot_duration": {
+                                        "description": "Slot duration in minutes",
+                                        "type": "integer",
+                                        "example": 30
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Slot updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Slot updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid input."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Only doctors can update booking slots."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Slot Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Slot not found or unauthorized."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/get-appointments-list": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Get Appointments List",
+                "description": "Returns appointment list for authenticated user (customer or doctor) filtered by status",
+                "operationId": "getAppointmentsList",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Appointment status filter",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "upcoming",
+                                "completed",
+                                "cancelled"
+                            ]
+                        },
+                        "example": "upcoming"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment list fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment list fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "appointment_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "doctor_id": {
+                                                                "type": "integer",
+                                                                "example": 5,
+                                                                "nullable": true
+                                                            },
+                                                            "doctor_name": {
+                                                                "type": "string",
+                                                                "example": "Dr. Amit Sharma",
+                                                                "nullable": true
+                                                            },
+                                                            "specialist": {
+                                                                "type": "string",
+                                                                "example": "Cardiologist",
+                                                                "nullable": true
+                                                            },
+                                                            "customer_id": {
+                                                                "type": "integer",
+                                                                "example": 10,
+                                                                "nullable": true
+                                                            },
+                                                            "customer_name": {
+                                                                "type": "string",
+                                                                "example": "Rahul Sharma",
+                                                                "nullable": true
+                                                            },
+                                                            "booking_date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "2026-02-20"
+                                                            },
+                                                            "weekday": {
+                                                                "type": "string",
+                                                                "example": "Monday"
+                                                            },
+                                                            "slot_time": {
+                                                                "type": "string",
+                                                                "example": "14:00"
+                                                            },
+                                                            "appointment_type": {
+                                                                "type": "string",
+                                                                "example": "video"
+                                                            },
+                                                            "notes": {
+                                                                "type": "string",
+                                                                "example": "Need consultation",
+                                                                "nullable": true
+                                                            },
+                                                            "amount": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 500
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "upcoming"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/get-appointment-details": {
+            "get": {
+                "tags": [
+                    "Basic API"
+                ],
+                "summary": "Get Appointment Details",
+                "description": "Fetch appointment details for authenticated user (customer or doctor). Includes doctor/customer info and prescription if completed.",
+                "operationId": "getAppointmentDetails",
+                "parameters": [
+                    {
+                        "name": "appointment_id",
+                        "in": "query",
+                        "description": "Appointment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 15
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment details fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment details fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointment_id": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "booking_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-15"
+                                                },
+                                                "weekday": {
+                                                    "type": "string",
+                                                    "example": "Monday"
+                                                },
+                                                "slot_time": {
+                                                    "type": "string",
+                                                    "example": "14:00"
+                                                },
+                                                "appointment_type": {
+                                                    "type": "string",
+                                                    "example": "video"
+                                                },
+                                                "notes": {
+                                                    "type": "string",
+                                                    "example": "Patient has fever",
+                                                    "nullable": true
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 500
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "completed"
+                                                },
+                                                "doctor": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Dr. Amit Sharma"
+                                                        },
+                                                        "specialist": {
+                                                            "type": "string",
+                                                            "example": "Cardiologist"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "customer": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Rahul Sharma"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "prescription_notes": {
+                                                    "type": "string",
+                                                    "example": "Take medicines twice daily",
+                                                    "nullable": true
+                                                },
+                                                "prescription_images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "image_url": {
+                                                                "type": "string",
+                                                                "example": "https://example.com/storage/prescriptions/image1.jpg"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/upload-prescription-by-doctor": {
+            "post": {
+                "tags": [
+                    "Doctor API"
+                ],
+                "summary": "Upload prescription by doctor and mark appointment as completed",
+                "description": "Doctor uploads prescription images for an appointment and marks it as completed.",
+                "operationId": "uploadPrescriptionByDoctor",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "appointment_id",
+                                    "images[]"
+                                ],
+                                "properties": {
+                                    "appointment_id": {
+                                        "description": "ID of the appointment",
+                                        "type": "integer",
+                                        "example": 15
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Take medicine twice daily after meals",
+                                        "nullable": true
+                                    },
+                                    "images[]": {
+                                        "description": "Prescription images (jpg, jpeg, png)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Prescription uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Prescription uploaded and appointment completed successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The appointment id field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Only doctors can upload prescriptions"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/calculate-earnings-for-doctor": {
+            "post": {
+                "tags": [
+                    "Doctor API"
+                ],
+                "summary": "Calculate Doctor Earnings",
+                "description": "Returns completed appointments list and total earnings for authenticated doctor. Supports monthly (by month name) and yearly filters.",
+                "operationId": "calculateDoctorEarnings",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "filter_type",
+                                    "year"
+                                ],
+                                "properties": {
+                                    "filter_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "monthly",
+                                            "yearly"
+                                        ],
+                                        "example": "monthly"
+                                    },
+                                    "month": {
+                                        "description": "Required if filter_type is monthly. Month name (January, February...)",
+                                        "type": "string",
+                                        "example": "January"
+                                    },
+                                    "year": {
+                                        "type": "integer",
+                                        "example": 2026
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Doctor earnings fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doctor earnings fetched successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "completed_appointments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "customer_name": {
+                                                                "type": "string",
+                                                                "example": "Rahul Sharma"
+                                                            },
+                                                            "appointment_date": {
+                                                                "type": "string",
+                                                                "example": "2026-01-12"
+                                                            },
+                                                            "appointment_time": {
+                                                                "type": "string",
+                                                                "example": "14:00"
+                                                            },
+                                                            "amount": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 500
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "total_completed_income": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1200
+                                                },
+                                                "total_completed_count": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The filter_type field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/order/{id}": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Get Order Details",
+                "description": "Fetch single order details with user, address, and order items",
+                "operationId": "getOrderDetails",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Order ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Order not found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/my-prescriptions": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Get Customer Prescription List",
+                "description": "Fetch logged-in customer's prescription list",
+                "operationId": "getMyPrescriptions",
+                "responses": {
+                    "200": {
+                        "description": "Prescription list fetched successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "No prescription found"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "passport": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Basic API",
+            "description": "Basic API"
+        },
+        {
+            "name": "Customer API",
+            "description": "Customer API"
+        },
+        {
+            "name": "Doctor API",
+            "description": "Doctor API"
+        }
+    ]
+}
