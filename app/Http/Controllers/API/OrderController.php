@@ -262,12 +262,14 @@ class OrderController extends BaseController
 
         DB::beginTransaction();
         try {
+            $pay_status = ($payment_method == 'upi') ? 'paid' : 'pending';
             $order = $this->placeOrderFromCart(
                 $user_id,
                 $address_id,
                 $payment_method,
                 $request->razorpay_order_id ?? null,
-                $request->razorpay_payment_id ?? null
+                $request->razorpay_payment_id ?? null,
+                $pay_status
             );
             if(!$order){
                 DB::rollBack();
@@ -291,6 +293,7 @@ class OrderController extends BaseController
 
         try {
             $user_id = Auth::id();
+            // dd($user_id);
             $address = Address::where('id',$request->address_id)->where('user_id',$user_id)->first();
             if(!$address){
                 return $this->sendError("Address not found");
@@ -325,7 +328,7 @@ class OrderController extends BaseController
             return $this->sendError($e->getMessage());
         }
     }
-    private function placeOrderFromCart($user_id, $address_id, $payment_method, $razorpay_order_id, $transaction_id)
+    private function placeOrderFromCart($user_id, $address_id, $payment_method, $razorpay_order_id, $transaction_id,$pay_status = 'pending')
     {
         $existing = Order::where('razorpay_order_id', $razorpay_order_id)->first();
         if($existing){
@@ -357,7 +360,8 @@ class OrderController extends BaseController
         $order->discount_amount = $cart_data['discount_amount'];
         $order->order_type = $payment_method;
         $order->status = 'pending';
-        $order->pay_status = 'paid';
+        // $order->pay_status = 'paid';
+        $order->pay_status = $pay_status;
         $order->transaction_id = $transaction_id;
         $order->razorpay_order_id = $razorpay_order_id;
         $order->save();
@@ -423,7 +427,8 @@ class OrderController extends BaseController
                         $address_id,
                         'upi',
                         $razorpay_order_id,
-                        $razorpay_payment_id
+                        $razorpay_payment_id,
+                        'paid'
                     );
                     DB::commit();
                 } catch (\Exception $e) {

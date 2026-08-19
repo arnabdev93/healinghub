@@ -469,6 +469,87 @@ class BaseController extends Controller
      *       ),
      *       security={{"passport": {}}}
      * )
+     *  *  @OA\Post(
+    *     path="/healinghub/api/cart/razorpay-order",
+    *     tags={"Customer API"},
+    *     summary="Create Razorpay Order from Cart",
+    *     description="Creates a Razorpay order using the customer's cart total and selected address.",
+    *
+    *     @OA\RequestBody(
+    *         required=true,
+    *         @OA\JsonContent(
+    *             required={"address_id"},
+    *
+    *             @OA\Property(
+    *                 property="address_id",
+    *                 type="integer",
+    *                 example=1,
+    *                 description="Customer address ID"
+    *             )
+    *         )
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=200,
+    *         description="Razorpay order created successfully",
+    *         @OA\JsonContent(
+    *             @OA\Property(
+    *                 property="success",
+    *                 type="boolean",
+    *                 example=true
+    *             ),
+    *             @OA\Property(
+    *                 property="message",
+    *                 type="string",
+    *                 example="Razorpay order created"
+    *             ),
+    *             @OA\Property(
+    *                 property="data",
+    *                 type="object",
+    *                 @OA\Property(
+    *                     property="razorpay_order_id",
+    *                     type="string",
+    *                     example="order_RZP123456789"
+    *                 ),
+    *                 @OA\Property(
+    *                     property="razorpay_key",
+    *                     type="string",
+    *                     example="rzp_test_xxxxxxxxx"
+    *                 ),
+    *                 @OA\Property(
+    *                     property="amount",
+    *                     type="integer",
+    *                     example=150000,
+    *                     description="Amount in paise"
+    *                 )
+    *             )
+    *         )
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=400,
+    *         description="Validation or cart error",
+    *         @OA\JsonContent(
+    *             @OA\Property(
+    *                 property="success",
+    *                 type="boolean",
+    *                 example=false
+    *             ),
+    *             @OA\Property(
+    *                 property="message",
+    *                 type="string",
+    *                 example="Cart is empty"
+    *             )
+    *         )
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=401,
+    *         description="Unauthenticated"
+    *     ),
+    *
+    *     security={{"passport": {}}}
+    * )
     * @OA\Post(
     *     path="/healinghub/api/upload-prescription",
     *     operationId="uploadPrescription",
@@ -581,9 +662,12 @@ class BaseController extends Controller
     * summary="Order from Cart",
     *     @OA\RequestBody(
     *         @OA\JsonContent(
-    *             @OA\Property(property="address_id", type="string", example="1"),
-    *             @OA\Property(property="payment_method", type="string", example="upi")
-    *         )
+ *             @OA\Property(property="address_id", type="string", example="1"),
+ *             @OA\Property(property="payment_method", type="string", example="upi"),
+ *             @OA\Property(property="razorpay_payment_id", type="string", example="pay_Nz7abc123456"),
+ *             @OA\Property(property="razorpay_order_id", type="string", example="order_Nz7xyz123456"),
+ *             @OA\Property(property="razorpay_signature", type="string", example="abc123xyz456signature")
+ *         )
     *    ),
     *      @OA\Response(
     *          response=200,
@@ -1426,7 +1510,7 @@ class BaseController extends Controller
     *     operationId="getOrderDetails",
     *     tags={"Customer API"},
     *     security={{"passport": {}}},
-    *     
+    *
     *     @OA\Parameter(
     *         name="id",
     *         in="path",
@@ -1483,7 +1567,7 @@ class BaseController extends Controller
         ];
         return response()->json($response, 200);
     }
-    
+
     public function sendError($error, $errorMessages = [], $code = 200)
     {
         $response = [

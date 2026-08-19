@@ -906,6 +906,18 @@
                                     "payment_method": {
                                         "type": "string",
                                         "example": "upi"
+                                    },
+                                    "razorpay_payment_id": {
+                                        "type": "string",
+                                        "example": "pay_Nz7abc123456"
+                                    },
+                                    "razorpay_order_id": {
+                                        "type": "string",
+                                        "example": "order_Nz7xyz123456"
+                                    },
+                                    "razorpay_signature": {
+                                        "type": "string",
+                                        "example": "abc123xyz456signature"
                                     }
                                 },
                                 "type": "object"
@@ -921,6 +933,104 @@
                                 "schema": {}
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/cart/razorpay-order": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Create Razorpay Order from Cart",
+                "description": "Creates a Razorpay order using the customer's cart total and selected address.",
+                "operationId": "2c44715af2ed2de5430f83e253712292",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "address_id"
+                                ],
+                                "properties": {
+                                    "address_id": {
+                                        "description": "Customer address ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Razorpay order created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Razorpay order created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "razorpay_order_id": {
+                                                    "type": "string",
+                                                    "example": "order_RZP123456789"
+                                                },
+                                                "razorpay_key": {
+                                                    "type": "string",
+                                                    "example": "rzp_test_xxxxxxxxx"
+                                                },
+                                                "amount": {
+                                                    "description": "Amount in paise",
+                                                    "type": "integer",
+                                                    "example": 150000
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation or cart error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cart is empty"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 },
                 "security": [
