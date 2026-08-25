@@ -50,7 +50,7 @@ class CategoryController extends Controller
                                    </button>';
                     }
                 }
-                
+
                 return $status;
             })->addColumn('parent_category',function($row){
                 return $row->parent_name ?? '';
@@ -80,7 +80,7 @@ class CategoryController extends Controller
             'stateSave' => true,
             'deferLoading' => 0
         ]);
-        
+
         $dataTable = $builder->columns([
 
             'image' => [
@@ -222,7 +222,7 @@ class CategoryController extends Controller
             $category->parent_id = $request->parent_id;
             if($request->hasFile('image')){
                 CustomHelper::removeExistingFileFromStorage($category->image);//This is a helper function
-                $category->image = $request->image->store('category','public');    
+                $category->image = $request->image->store('category','public');
             }
             $category->save();
             return redirect()->route('categories.index')->withSuccess('Category Updated Successfully');

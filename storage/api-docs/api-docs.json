@@ -942,6 +942,96 @@
                 ]
             }
         },
+        "/healinghub/api/prescription-order/razorpay-order": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Create Prescription Razorpay Order",
+                "operationId": "a87d8cbd2f1fe5b90581c892f696ec12",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "order_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Razorpay order created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/healinghub/api/prescription-order/verify-payment": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Verify Prescription Payment",
+                "operationId": "c68570540677ee2ac13d746edd45fbe7",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "order_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "razorpay_payment_id": {
+                                        "type": "string",
+                                        "example": "pay_TTuQNzt1G396b0"
+                                    },
+                                    "razorpay_order_id": {
+                                        "type": "string",
+                                        "example": "order_TTuNsG9dtVoAiu"
+                                    },
+                                    "razorpay_signature": {
+                                        "type": "string",
+                                        "example": "generated_signature_here"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/healinghub/api/cart/razorpay-order": {
             "post": {
                 "tags": [
@@ -1488,6 +1578,58 @@
                 }
             }
         },
+        "/healinghub/api/appointment/razorpay-order": {
+            "post": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Create Appointment Razorpay Order",
+                "operationId": "953e6e2579cdc4ae2513f4dabcb203d4",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "doctor_id": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "booking_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-25"
+                                    },
+                                    "booking_time": {
+                                        "type": "string",
+                                        "example": "10:00"
+                                    },
+                                    "appointment_type": {
+                                        "type": "string",
+                                        "example": "video"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Razorpay order created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/healinghub/api/book-appointment": {
             "post": {
                 "tags": [
@@ -1533,6 +1675,22 @@
                                     "notes": {
                                         "type": "string",
                                         "example": "Need consultation for headache"
+                                    },
+                                    "payment_method": {
+                                        "type": "string",
+                                        "example": "upi"
+                                    },
+                                    "razorpay_payment_id": {
+                                        "type": "string",
+                                        "example": "pay_TTuQNzt1G396b0"
+                                    },
+                                    "razorpay_order_id": {
+                                        "type": "string",
+                                        "example": "order_TTuNsG9dtVoAiu"
+                                    },
+                                    "razorpay_signature": {
+                                        "type": "string",
+                                        "example": "generated_signature_here"
                                     }
                                 },
                                 "type": "object"

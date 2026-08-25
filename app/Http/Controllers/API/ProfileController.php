@@ -27,6 +27,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\GoogleMeetService;
 use App\Services\MeetingService;
+use Razorpay\Api\Api;
 
 
 class ProfileController extends BaseController
@@ -213,147 +214,8 @@ class ProfileController extends BaseController
     }
 
 
-    public function bookAppoinment(Request $request, GoogleMeetService $googleMeetService)
-    {
-        $rules = [
-            'doctor_id' => 'required|exists:users,id',
-            'booking_date' => 'required|date|after_or_equal:today',
-            'booking_time' => 'required|date_format:H:i',
-            'appointment_type' => 'required|in:audio,video',
-            'notes' => 'nullable|string|max:1000'
-        ];
 
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first());
-        }
-
-        $doctor = User::where('id', $request->doctor_id)
-            ->where('role', 'doctor')
-            ->with('details')
-            ->first();
-
-        if (!$doctor) {
-            return $this->sendError('Invalid doctor selected');
-        }
-
-        $weekday = Carbon::parse($request->booking_date)->format('l');
-
-        $slot = BookingSlot::where('user_id', $doctor->id)
-            ->where('weekday', $weekday)
-            ->first();
-
-        if (!$slot) {
-            return $this->sendError("Doctor is not available on {$weekday}");
-        }
-
-        if (!in_array($request->booking_time, $slot->times)) {
-            return $this->sendError("Selected time is not available");
-        }
-
-        $userAlreadyBooked = BookAppointment::where('user_id', Auth::id())
-            ->where('doctor_id', $doctor->id)
-            ->where('booking_date', $request->booking_date)
-            ->where('booking_time', $request->booking_time)
-            ->where('status', '!=', 'cancelled')
-            ->exists();
-
-        if ($userAlreadyBooked) {
-            return $this->sendError("You have already booked this time slot.");
-        }
-
-        $alreadyBooked = BookAppointment::where('doctor_id', $doctor->id)
-            ->where('booking_date', $request->booking_date)
-            ->where('booking_time', $request->booking_time)
-            ->where('status', '!=', 'cancelled')
-            ->exists();
-
-        if ($alreadyBooked) {
-            return $this->sendError("This time slot is already booked");
-        }
-
-        if (!$doctor->details) {
-            return $this->sendError("Doctor pricing not set");
-        }
-
-        $amount = $request->appointment_type === 'audio'
-            ? $doctor->details->consult_fee_phone
-            : $doctor->details->consult_fee_vdo;
-
-        if (!$amount) {
-            return $this->sendError("Consultation fee not available");
-        }
-        //Google meet link gnerate
-        $meetingLink = null;
-
-        if ($request->appointment_type === 'video') {
-
-            $tokenPath = storage_path('app/google-calendar-token.json');
-
-            if (!file_exists($tokenPath)) {
-                return $this->sendError('Google Meet not configured yet.');
-            }
-
-            $meetingLink = $googleMeetService->createMeeting(
-                $request->booking_date,
-                $request->booking_time
-            );
-        }
-
-        // $meetingLink = null;
-
-        // if ($request->appointment_type === 'video') {
-        //     $tokenExists =DoctorGoogleToken::where('doctor_id', $doctor->id)->exists();
-
-        //     if (!$tokenExists) {
-        //         return $this->sendError('This doctor has not connected their Google account yet.');
-        //     }
-
-        //     $meetingLink = $googleMeetService->createMeeting(
-        //         $request->booking_date,
-        //         $request->booking_time,
-        //         $doctor->id
-        //     );
-
-        //     if (!$meetingLink) {
-        //         return $this->sendError('Failed to create meeting. Please try again.');
-        //     }
-        // }
-
-        $appointment = BookAppointment::create([
-            'user_id' => Auth::id(),
-            'appointment_no' => BookAppointment::generateAppointmentNo(),
-            'doctor_id' => $doctor->id,
-            'booking_date' => $request->booking_date,
-            'weekday' => $weekday,
-            'booking_time' => $request->booking_time,
-            'appointment_type' => $request->appointment_type,
-            'meeting_link' => $meetingLink,
-            'amount' => $amount,
-            'notes' => $request->notes,
-            'status' => 'upcoming'
-        ]);
-
-        //payment method starts
-
-
-
-        //payment method ends
-
-        AppointmentStatusLog::create([
-            'appointment_id'   => $appointment->id,
-            'changed_by'       => Auth::id(),
-            'note'             => 'new appoiment book by customer',
-            'new_status'       => $appointment->status,
-            'changed_at'       => now(),
-        ]);
-
-        return $this->sendResponse([], "Appointment booked successfully");
-    }
-
-
-    // public function bookAppoinment(Request $request, MeetingService $meetingService)
+    // public function bookAppoinment(Request $request, GoogleMeetService $googleMeetService)
     // {
     //     $rules = [
     //         'doctor_id' => 'required|exists:users,id',
@@ -425,21 +287,21 @@ class ProfileController extends BaseController
     //         return $this->sendError("Consultation fee not available");
     //     }
     //     //Google meet link gnerate
-    //     // $meetingLink = null;
+    //     $meetingLink = null;
 
-    //     // if ($request->appointment_type === 'video') {
+    //     if ($request->appointment_type === 'video') {
 
-    //     //     $tokenPath = storage_path('app/google-calendar-token.json');
+    //         $tokenPath = storage_path('app/google-calendar-token.json');
 
-    //     //     if (!file_exists($tokenPath)) {
-    //     //         return $this->sendError('Google Meet not configured yet.');
-    //     //     }
+    //         if (!file_exists($tokenPath)) {
+    //             return $this->sendError('Google Meet not configured yet.');
+    //         }
 
-    //     //     $meetingLink = $googleMeetService->createMeeting(
-    //     //         $request->booking_date,
-    //     //         $request->booking_time
-    //     //     );
-    //     // }
+    //         $meetingLink = $googleMeetService->createMeeting(
+    //             $request->booking_date,
+    //             $request->booking_time
+    //         );
+    //     }
 
     //     // $meetingLink = null;
 
@@ -460,13 +322,6 @@ class ProfileController extends BaseController
     //     //         return $this->sendError('Failed to create meeting. Please try again.');
     //     //     }
     //     // }
-
-    //     $appointmentNo = BookAppointment::generateAppointmentNo();
-
-    //     $meetingLink = null;
-    //     if ($request->appointment_type === 'video') {
-    //         $meetingLink = $meetingService->createMeeting($appointmentNo);
-    //     }
 
     //     $appointment = BookAppointment::create([
     //         'user_id' => Auth::id(),
@@ -498,6 +353,237 @@ class ProfileController extends BaseController
 
     //     return $this->sendResponse([], "Appointment booked successfully");
     // }
+    public function createAppointmentRazorpayOrder(Request $request)
+    {
+        $rules = [
+            'doctor_id' => 'required|exists:users,id',
+            'booking_date' => 'required|date|after_or_equal:today',
+            'booking_time' => 'required|date_format:H:i',
+            'appointment_type' => 'required|in:audio,video',
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $doctor = User::where('id', $request->doctor_id)->where('role', 'doctor')->with('details')->first();
+        if (!$doctor) {
+            return $this->sendError('Invalid doctor selected');
+        }
+
+        $weekday = Carbon::parse($request->booking_date)->format('l');
+        $slot = BookingSlot::where('user_id', $doctor->id)->where('weekday', $weekday)->first();
+        if (!$slot) {
+            return $this->sendError("Doctor is not available on {$weekday}");
+        }
+        if (!in_array($request->booking_time, $slot->times)) {
+            return $this->sendError("Selected time is not available");
+        }
+
+        $alreadyBooked = BookAppointment::where('doctor_id', $doctor->id)
+            ->where('booking_date', $request->booking_date)
+            ->where('booking_time', $request->booking_time)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+        if ($alreadyBooked) {
+            return $this->sendError("This time slot is already booked");
+        }
+
+        if (!$doctor->details) {
+            return $this->sendError("Doctor pricing not set");
+        }
+        $amount = $request->appointment_type === 'audio'
+            ? $doctor->details->consult_fee_phone
+            : $doctor->details->consult_fee_vdo;
+        if (!$amount) {
+            return $this->sendError("Consultation fee not available");
+        }
+
+        try {
+            $pay_amount = round($amount * 100);
+
+            $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+            $razorpay_order = $api->order->create([
+                'receipt'  => 'apmt_rcpt_'.Auth::id().'_'.time(),
+                'amount'   => $pay_amount,
+                'currency' => 'INR',
+                'notes'    => [
+                    'type'             => 'appointment',
+                    'user_id'          => Auth::id(),
+                    'doctor_id'        => $request->doctor_id,
+                    'booking_date'     => $request->booking_date,
+                    'booking_time'     => $request->booking_time,
+                    'appointment_type' => $request->appointment_type,
+                    'notes_text'       => $request->notes ?? '',
+                ],
+            ]);
+
+            return $this->sendResponse([
+                'razorpay_order_id' => $razorpay_order['id'],
+                'razorpay_key'      => config('services.razorpay.key'),
+                'amount'            => $pay_amount,
+            ], 'Razorpay order created');
+
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
+    }
+    public function bookAppoinment(Request $request, GoogleMeetService $googleMeetService)
+    {
+        $rules = [
+            'doctor_id' => 'required|exists:users,id',
+            'booking_date' => 'required|date|after_or_equal:today',
+            'booking_time' => 'required|date_format:H:i',
+            'appointment_type' => 'required|in:audio,video',
+            'notes' => 'nullable|string|max:1000',
+            'payment_method' => 'required',
+            'razorpay_payment_id' => 'required_if:payment_method,upi',
+            'razorpay_order_id' => 'required_if:payment_method,upi',
+            'razorpay_signature' => 'required_if:payment_method,upi',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $doctor = User::where('id', $request->doctor_id)
+            ->where('role', 'doctor')
+            ->with('details')
+            ->first();
+
+        if (!$doctor) {
+            return $this->sendError('Invalid doctor selected');
+        }
+
+        $weekday = Carbon::parse($request->booking_date)->format('l');
+
+        $slot = BookingSlot::where('user_id', $doctor->id)
+            ->where('weekday', $weekday)
+            ->first();
+
+        if (!$slot) {
+            return $this->sendError("Doctor is not available on {$weekday}");
+        }
+
+        if (!in_array($request->booking_time, $slot->times)) {
+            return $this->sendError("Selected time is not available");
+        }
+
+        $userAlreadyBooked = BookAppointment::where('user_id', Auth::id())
+            ->where('doctor_id', $doctor->id)
+            ->where('booking_date', $request->booking_date)
+            ->where('booking_time', $request->booking_time)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+
+        if ($userAlreadyBooked) {
+            return $this->sendError("You have already booked this time slot.");
+        }
+
+        $alreadyBooked = BookAppointment::where('doctor_id', $doctor->id)
+            ->where('booking_date', $request->booking_date)
+            ->where('booking_time', $request->booking_time)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+
+        if ($alreadyBooked) {
+            return $this->sendError("This time slot is already booked");
+        }
+
+        if (!$doctor->details) {
+            return $this->sendError("Doctor pricing not set");
+        }
+
+        $amount = $request->appointment_type === 'audio'
+            ? $doctor->details->consult_fee_phone
+            : $doctor->details->consult_fee_vdo;
+
+        if (!$amount) {
+            return $this->sendError("Consultation fee not available");
+        }
+
+        //Google meet link gnerate
+        $meetingLink = null;
+
+        if ($request->appointment_type === 'video') {
+
+            $tokenPath = storage_path('app/google-calendar-token.json');
+
+            if (!file_exists($tokenPath)) {
+                return $this->sendError('Google Meet not configured yet.');
+            }
+
+            $meetingLink = $googleMeetService->createMeeting(
+                $request->booking_date,
+                $request->booking_time
+            );
+        }
+
+
+
+        //payment method starts
+        if($request->payment_method == 'upi'){
+            try {
+                $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
+                $api->utility->verifyPaymentSignature([
+                    'razorpay_order_id'   => $request->razorpay_order_id,
+                    'razorpay_payment_id' => $request->razorpay_payment_id,
+                    'razorpay_signature'  => $request->razorpay_signature,
+                ]);
+            } catch (\Exception $e) {
+                return $this->sendError("Payment verification failed");
+            }
+        }
+        //payment method ends
+
+        DB::beginTransaction();
+        try {
+            $appointment = BookAppointment::create([
+                'user_id' => Auth::id(),
+                'appointment_no' => BookAppointment::generateAppointmentNo(),
+                'doctor_id' => $doctor->id,
+                'booking_date' => $request->booking_date,
+                'weekday' => $weekday,
+                'booking_time' => $request->booking_time,
+                'appointment_type' => $request->appointment_type,
+                'meeting_link' => $meetingLink,
+                'amount' => $amount,
+                'notes' => $request->notes,
+                'status' => 'upcoming'
+            ]);
+
+            $payment_method_id = PaymentMethod::where('slug', $request->payment_method)->value('id');
+
+            Payment::create([
+                'appointment_id'    => $appointment->id,
+                'user_id'           => Auth::id(),
+                'doctor_id'         => $doctor->id,
+                'payment_method_id' => $payment_method_id,
+                'transaction_id'    => $request->razorpay_payment_id,
+                'amount'            => $appointment->amount,
+                'status'            => $request->payment_method == 'upi' ? 'paid' : 'pending',
+                'paid_at'           => $request->payment_method == 'upi' ? now() : null,
+            ]);
+
+            AppointmentStatusLog::create([
+                'appointment_id'   => $appointment->id,
+                'changed_by'       => Auth::id(),
+                'note'             => 'new appoiment book by customer',
+                'new_status'       => $appointment->status,
+                'changed_at'       => now(),
+            ]);
+
+            DB::commit();
+            return $this->sendResponse([], "Appointment booked successfully");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError($e->getMessage());
+        }
+    }
+
 
 
     public function getAvalableSlots(Request $request)

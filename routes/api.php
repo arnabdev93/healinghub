@@ -39,6 +39,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     //doctors & customer section
     Route::get('/my-prescriptions', 'ProfileController@getMyPrescriptions');
+    Route::post('appointment/razorpay-order', 'ProfileController@createAppointmentRazorpayOrder');
     Route::post('book-appointment', 'ProfileController@bookAppoinment');
     Route::post('cancel-appointment', 'ProfileController@cancelAppointment');
     Route::post('request-for-price-quote', 'ProfileController@requestForPrescription');
@@ -72,6 +73,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/order/{id}', 'OrderController@getOrderDetails');
     Route::post('upload-prescription','OrderController@uploadPrescription');
     Route::post('order','OrderController@store');//Cart Order
+    //prescription order payment
+    Route::post('prescription-order/razorpay-order', 'OrderController@createPrescriptionRazorpayOrder');
+    Route::post('prescription-order/verify-payment', 'OrderController@verifyPrescriptionPayment');
 });
 
 // Route::get('app-settings','AuthController@appSettings');

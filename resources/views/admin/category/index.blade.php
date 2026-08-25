@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('page_title')
-   
+
 @endsection
 @section('content')
    <div class="content-header">
@@ -16,7 +16,7 @@
                </nav>
             </div>
          </div>
-         
+
       </div>
    </div>
    <section class="content">

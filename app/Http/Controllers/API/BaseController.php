@@ -469,7 +469,42 @@ class BaseController extends Controller
      *       ),
      *       security={{"passport": {}}}
      * )
-     *  *  @OA\Post(
+     * @OA\Post(
+    *     path="/healinghub/api/prescription-order/razorpay-order",
+    *     tags={"Customer API"},
+    *     summary="Create Prescription Razorpay Order",
+    *     @OA\RequestBody(
+    *         @OA\JsonContent(
+    *             @OA\Property(property="order_id", type="integer", example=1)
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Razorpay order created",
+    *         @OA\JsonContent()
+    *     ),
+    *     security={{"passport": {}}}
+    * )
+    * @OA\Post(
+    *     path="/healinghub/api/prescription-order/verify-payment",
+    *     tags={"Customer API"},
+    *     summary="Verify Prescription Payment",
+    *     @OA\RequestBody(
+    *         @OA\JsonContent(
+    *             @OA\Property(property="order_id", type="integer", example=1),
+    *             @OA\Property(property="razorpay_payment_id", type="string", example="pay_TTuQNzt1G396b0"),
+    *             @OA\Property(property="razorpay_order_id", type="string", example="order_TTuNsG9dtVoAiu"),
+    *             @OA\Property(property="razorpay_signature", type="string", example="generated_signature_here")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Payment successful",
+    *         @OA\JsonContent()
+    *     ),
+    *     security={{"passport": {}}}
+    * )
+    *  @OA\Post(
     *     path="/healinghub/api/cart/razorpay-order",
     *     tags={"Customer API"},
     *     summary="Create Razorpay Order from Cart",
@@ -791,6 +826,25 @@ class BaseController extends Controller
     *     )
     * )
     * @OA\Post(
+    *     path="/healinghub/api/appointment/razorpay-order",
+    *     tags={"Customer API"},
+    *     summary="Create Appointment Razorpay Order",
+    *     @OA\RequestBody(
+    *         @OA\JsonContent(
+    *             @OA\Property(property="doctor_id", type="integer", example=10),
+    *             @OA\Property(property="booking_date", type="string", format="date", example="2026-08-25"),
+    *             @OA\Property(property="booking_time", type="string", example="10:00"),
+    *             @OA\Property(property="appointment_type", type="string", example="video")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Razorpay order created",
+    *         @OA\JsonContent()
+    *     ),
+    *     security={{"passport": {}}}
+    * )
+    * @OA\Post(
     *     path="/healinghub/api/book-appointment",
     *     summary="Book Appointment",
     *     description="Customer can book an appointment with a doctor",
@@ -806,7 +860,11 @@ class BaseController extends Controller
     *             @OA\Property(property="booking_date", type="string", format="date", example="2026-03-15"),
     *             @OA\Property(property="booking_time", type="string", format="time", example="14:30"),
     *             @OA\Property(property="appointment_type", type="string", enum={"audio","video"}, example="video"),
-    *             @OA\Property(property="notes", type="string", example="Need consultation for headache")
+    *             @OA\Property(property="notes", type="string", example="Need consultation for headache"),
+    *             @OA\Property(property="payment_method", type="string", example="upi"),
+    *             @OA\Property(property="razorpay_payment_id", type="string", example="pay_TTuQNzt1G396b0"),
+    *             @OA\Property(property="razorpay_order_id", type="string", example="order_TTuNsG9dtVoAiu"),
+    *             @OA\Property(property="razorpay_signature", type="string", example="generated_signature_here")
     *         )
     *     ),
     *
