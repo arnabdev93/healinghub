@@ -78,6 +78,8 @@
                               </select>
                            </div>
                            <div class="col-md-2 d-flex align-items-end">
+                              {{-- <button class="btn btn-primary me-2" id="appointment_search_btn_new">Search</button>
+                              <button class="btn btn-secondary" id="appointment_clear_btn_new">Clear</button> --}}
                               <button class="btn btn-primary me-2" id="filter_btn_appointment">Search</button>
                               <button class="btn btn-secondary" id="clear_filter_appointment">Clear</button>
                            </div>
@@ -94,4 +96,42 @@
 @endsection
 @push('page_scripts')
 {!! $dataTable->scripts() !!}
+{{-- <script>
+$(document).ready(function () {
+    $('#appointment_search_btn_new').on('click', function (e) {
+        e.preventDefault();
+        window.LaravelDataTables["dataTableBuilder"].ajax.reload();
+
+    });
+
+    $('#appointment_clear_btn_new').on('click', function (e) {
+        e.preventDefault();
+        // Clear date
+        $('#datefilter').val('');
+        $('#start_date_value').val('');
+        $('#end_date_value').val('');
+
+        // Clear patient
+        $('#patient_filter')
+            .val('')
+            .trigger('change');
+        // Clear doctor
+        $('#doctor_id_filter')
+            .val('')
+            .trigger('change');
+        // Clear appointment type
+        $('#appointment_type_filter')
+            .val('')
+            .trigger('change');
+        // Clear appointment status
+        $('#appointment_status_filter')
+            .val('')
+            .trigger('change');
+        // Reload table
+        window.LaravelDataTables["dataTableBuilder"].ajax.reload();
+
+    });
+});
+</script> --}}
 @endpush
+

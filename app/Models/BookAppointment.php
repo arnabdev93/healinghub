@@ -15,6 +15,7 @@ class BookAppointment extends Model
         'booking_time',
         'appointment_type',
         'amount',
+        'razorpay_order_id',
         'notes',
         'status',
         'meeting_link',

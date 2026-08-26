@@ -697,12 +697,12 @@ class OrderController extends BaseController
                 $order->razorpay_order_id = $razorpay_order_id;
                 $order->save();
 
-                OrderStatusLog::create([
-                    'user_id'  => $order->user_id,
-                    'order_id' => $order->id,
-                    'status'   => 'paid',
-                    'notes'    => 'Payment Completed via Webhook',
-                ]);
+                $status_log = new OrderStatusLog;
+                $status_log->user_id = $order->user_id;
+                $status_log->order_id = $order->id;
+                $status_log->status = 'paid';
+                $status_log->notes = 'Payment Completed via Webhook';
+                $status_log->save();
             }
             DB::commit();
         } catch (\Exception $e) {

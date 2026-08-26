@@ -1615,6 +1615,81 @@ class BaseController extends Controller
     *         description="No prescription found"
     *     )
     * )
+    * @OA\Post(
+    *     path="/healinghub/api/appointment/review",
+    *     tags={"Customer API"},
+    *     summary="Submit Appointment Review",
+    *     description="Allows a customer to submit a rating for a completed appointment.",
+    *
+    *     @OA\RequestBody(
+    *         required=true,
+    *         @OA\JsonContent(
+    *             required={"appointment_id", "rating"},
+    *
+    *             @OA\Property(
+    *                 property="appointment_id",
+    *                 type="integer",
+    *                 example=1,
+    *                 description="Completed appointment ID"
+    *             ),
+    *             @OA\Property(
+    *                 property="rating",
+    *                 type="number",
+    *                 format="float",
+    *                 minimum=1,
+    *                 maximum=5,
+    *                 example=4.5,
+    *                 description="Rating between 1 and 5"
+    *             )
+    *         )
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=200,
+    *         description="Review submitted successfully",
+    *         @OA\JsonContent(
+    *             @OA\Property(
+    *                 property="success",
+    *                 type="boolean",
+    *                 example=true
+    *             ),
+    *             @OA\Property(
+    *                 property="message",
+    *                 type="string",
+    *                 example="Review submitted successfully."
+    *             ),
+    *             @OA\Property(
+    *                 property="data",
+    *                 type="object",
+    *                 example={}
+    *             )
+    *         )
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=400,
+    *         description="Validation or review error",
+    *         @OA\JsonContent(
+    *             @OA\Property(
+    *                 property="success",
+    *                 type="boolean",
+    *                 example=false
+    *             ),
+    *             @OA\Property(
+    *                 property="message",
+    *                 type="string",
+    *                 example="You can only review after the appointment is completed."
+    *             )
+    *         )
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=401,
+    *         description="Unauthenticated"
+    *     ),
+    *
+    *     security={{"passport": {}}}
+    * )
     */
     public function sendResponse($result, $message)
     {

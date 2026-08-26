@@ -41,8 +41,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/my-prescriptions', 'ProfileController@getMyPrescriptions');
     Route::post('appointment/razorpay-order', 'ProfileController@createAppointmentRazorpayOrder');
     Route::post('book-appointment', 'ProfileController@bookAppoinment');
+    Route::post('appointment/review', 'ProfileController@submitReview');
     Route::post('cancel-appointment', 'ProfileController@cancelAppointment');
     Route::post('request-for-price-quote', 'ProfileController@requestForPrescription');
+
 
     //payment section
     Route::post('payment-method', 'ProfileController@paymentMethod');

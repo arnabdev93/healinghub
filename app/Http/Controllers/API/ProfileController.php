@@ -15,6 +15,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\UserReview;
 use App\Models\PaymentMethod;
 use App\Models\Prescription;
 use App\Models\DoctorGoogleToken;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 use App\Services\GoogleMeetService;
 use App\Services\MeetingService;
 use Razorpay\Api\Api;
+
 
 
 class ProfileController extends BaseController
@@ -154,8 +156,16 @@ class ProfileController extends BaseController
                     'bookingSlots:id,user_id,weekday'
                 ])
                 ->get(['id', 'name']);
+        $doctorIds = $doctors->pluck('id');
+        $ratings = UserReview::whereIn('receiver_id', $doctorIds)
+        ->selectRaw('receiver_id, AVG(rating) as avg_rating, COUNT(*) as review_count')
+        ->groupBy('receiver_id')
+        ->get()
+        ->keyBy('receiver_id');
 
-        $formattedDoctors = $doctors->map(function ($doctor) {
+        $formattedDoctors = $doctors->map(function ($doctor) use ($ratings) {
+
+        $rating = $ratings->get($doctor->id);
 
             return [
                 'doctor_id' => $doctor->details->user_id,
@@ -167,7 +177,9 @@ class ProfileController extends BaseController
                 'available_weekdays' => $doctor->bookingSlots
                     ->pluck('weekday')
                     ->unique()
-                    ->values()
+                    ->values(),
+                'average_rating' => $rating ? round($rating->avg_rating, 1) : 0,
+                'review_count' => $rating ? $rating->review_count : 0,
             ];
         });
 
@@ -197,6 +209,9 @@ class ProfileController extends BaseController
         if (!$doctor) {
             return $this->sendError('Doctor not found');
         }
+        $ratingData = UserReview::where('receiver_id', $doctor->id)
+        ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as review_count')
+        ->first();
 
         $response = [
             'id' => $doctor->details->user_id,
@@ -208,6 +223,8 @@ class ProfileController extends BaseController
             'image' => asset('storage/'.$doctor->details->image ?? null),
             'speciality' => $doctor->details->specialist ?? null,
             'about' => $doctor->details->about ?? null,
+            'average_rating' => $ratingData && $ratingData->review_count > 0 ? round($ratingData->avg_rating, 1) : 0,
+            'review_count' => $ratingData ? $ratingData->review_count : 0,
         ];
 
         return $this->sendResponse($response, "Successful");
@@ -583,6 +600,51 @@ class ProfileController extends BaseController
             return $this->sendError($e->getMessage());
         }
     }
+    public function submitReview(Request $request)
+    {
+        $rules = [
+            'appointment_id' => 'required|exists:book_appointments,id',
+            'rating' => 'required|numeric|min:1|max:5',
+            // 'comment' => 'nullable|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+
+        $customer = Auth::user();
+
+        $appointment = BookAppointment::where('id', $request->appointment_id)
+            ->where('user_id', $customer->id)
+            ->first();
+
+        if (!$appointment) {
+            return $this->sendError('Appointment not found or access denied.');
+        }
+
+        if ($appointment->status !== 'completed') {
+            return $this->sendError('You can only review after the appointment is completed.');
+        }
+
+        $alreadyReviewed = UserReview::where('appointment_id', $appointment->id)
+            ->where('sender_id', $customer->id)
+            ->exists();
+
+        if ($alreadyReviewed) {
+            return $this->sendError('You have already submitted a review for this appointment.');
+        }
+        $user_review = new UserReview;
+        $user_review->appointment_id = $appointment->id;
+        $user_review->sender_id = $customer->id;
+        $user_review->receiver_id = $appointment->doctor_id;
+        $user_review->rating = $request->rating;
+        // $user_review->comment = $request->comment;
+        $user_review->save();
+
+        return $this->sendResponse([], 'Review submitted successfully.');
+    }
 
 
 
@@ -640,6 +702,9 @@ class ProfileController extends BaseController
                 return \Carbon\Carbon::parse($time)->format('H:i');
             })
             ->toArray();
+        echo "<pre>";
+        print_r($bookedTimes);
+        exit;
 
         $timesWithStatus = collect($slot->times)->map(function ($time) use ($bookedTimes) {
             $formattedTime = \Carbon\Carbon::parse($time)->format('H:i');
@@ -1316,9 +1381,9 @@ class ProfileController extends BaseController
                 ]);
             }
 
-            $appointment->update([
-                'status' => 'completed'
-            ]);
+            // $appointment->update([
+            //     'status' => 'completed'
+            // ]);
 
             AppointmentStatusLog::create([
                 'appointment_id'   => $appointment->id,
@@ -1549,4 +1614,6 @@ class ProfileController extends BaseController
         ], 'Payment methods fetched successfully');
 
     }
+
+
 }
