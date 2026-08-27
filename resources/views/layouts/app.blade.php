@@ -221,13 +221,21 @@
 					reloadTable();
 				});
 
-				$('#category_filter').on('change', function () {
-					let filters = {
-						category_id: $('#category_filter').val(),
-					};
-					localStorage.setItem('product_filters', JSON.stringify(filters));
-					reloadTable();
-				});
+				// $('#category_filter').on('change', function () {
+				// 	let filters = {
+				// 		category_id: $('#category_filter').val(),
+				// 	};
+				// 	localStorage.setItem('product_filters', JSON.stringify(filters));
+				// 	reloadTable();
+				// });
+                $('#category_filter').on('change', function () {
+                    let filters = {
+                        patient_id: $('#patient_filter').val(),
+                        category_id: $('#category_filter').val(),
+                    };
+                    localStorage.setItem('product_filters', JSON.stringify(filters));
+                    reloadTable();
+                });
 
 				$('#clear_filter_appointment').on('click', function (e) {
 					e.preventDefault();

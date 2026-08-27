@@ -60,14 +60,89 @@
                         <h4 class="box-title">Appointment history</h4>
                     </div>
                     <div class="box-body">
-                        <div class="row mb-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label"><strong>Filter by Date</strong></label>
-                                <input type="date" id="booking_date_filter" class="form-control">
+                        <form method="GET" action="{{ route('doctor.earnings.details', $doctor->id) }}">
+                            <div class="row mb-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label"><strong>Month</strong></label>
+                                    <select name="month" class="form-control">
+                                        @foreach(range(1,12) as $m)
+                                            <option value="{{ $m }}" {{ $m == $selectedMonth ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::create()->month((int) $m)->format('F') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label"><strong>Year</strong></label>
+                                    <select name="year" class="form-control">
+                                        @for($y = now()->year; $y >= now()->year - 5; $y--)
+                                            <option value="{{ $y }}" {{ $y == $selectedYear ? 'selected' : '' }}>{{ $y }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="col-md-auto">
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                     <a href="{{ route('doctor.earnings.details', $doctor->id) }}" class="btn btn-secondary">Clear</a>
+                                </div>
                             </div>
-                            <div class="col-md-auto">
-                                <button class="btn btn-primary me-2" id="date_filter_btn">Search</button>
-                                <button class="btn btn-secondary" id="clear_date_filter">Clear</button>
+                        </form>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="alert alert-info d-flex justify-content-between align-items-center flex-wrap mb-0">
+                                    <div>
+                                        <strong>Total:</strong> ₹{{ $totalAmount }} &nbsp;|&nbsp;
+                                        <strong>Earning Percentage ({{ $earningPercentage }}%):</strong> ₹{{ $platformShare }} &nbsp;|&nbsp;
+                                        <strong>Doctor Share:</strong> ₹{{ $doctorShare }}
+                                    </div>
+                                    <div>
+                                       @if(!$isSettled)
+                                                <button type="button"
+                                                    class="btn btn-success btn-sm"
+                                                    onclick="checkSettlementAmount()">
+                                                Settlement
+                                            </button>
+                                                <div class="modal fade" id="settleConfirmModal" tabindex="-1" aria-labelledby="settleConfirmModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="settleConfirmModalLabel">Confirm Settlement</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>You are about to settle earnings for
+                                                                    <strong>{{ \Carbon\Carbon::create()->month((int) $selectedMonth)->format('F') }} {{ $selectedYear }}</strong>.
+                                                                </p>
+                                                                <ul class="mb-0">
+                                                                    <li>Total Amount: <strong>₹{{ $totalAmount }}</strong></li>
+                                                                    <li>Platform Share ({{ $earningPercentage }}%): <strong>₹{{ $platformShare }}</strong></li>
+                                                                    <li>Doctor Share: <strong>₹{{ $doctorShare }}</strong></li>
+                                                                </ul>
+                                                                <p class="text-danger mt-3 mb-0">This action cannot be undone once confirmed.</p>
+                                                            </div>
+                                                            <div class="modal-footer d-flex justify-content-between">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                    Cancel
+                                                                </button>
+
+                                                                <form method="POST" action="{{ route('doctor.earnings.settle', $doctor->id) }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="month" value="{{ $selectedMonth }}">
+                                                                    <input type="hidden" name="year" value="{{ $selectedYear }}">
+
+                                                                    <button type="submit" class="btn btn-success">
+                                                                        Yes, Settle Now
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <span class="badge bg-secondary">Already Settled</span>
+                                            @endif
+                                        </div>
+                                </div>
                             </div>
                         </div>
 
@@ -222,19 +297,44 @@
 @endsection
 
 @push('page_scripts')
+<style>
+    #dataTableBuilder_wrapper .dt-length {
+        display: none !important;
+    }
+    #dataTableBuilder_wrapper .dt-search {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        margin-bottom: 15px !important;
+    }
+
+    #dataTableBuilder_wrapper .dt-search label {
+        margin-bottom: 0 !important;
+        margin-right: 8px !important;
+    }
+
+    #dataTableBuilder_wrapper .dt-search input {
+        width: 200px !important;
+        margin: 0 !important;
+    }
+</style>
     {!! $dataTable->scripts() !!}
     <script>
-    $(function () {
-        var table = $('.dataTable').DataTable();
+        function checkSettlementAmount() {
+            const totalAmount = {{ $totalAmount }};
+            if (totalAmount <= 0) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'No earning available for the selected month and year.'
+                });
+                return;
+            }
+            const modal = new bootstrap.Modal(
+                document.getElementById('settleConfirmModal')
+            );
 
-        $('#date_filter_btn').on('click', function () {
-            table.draw();
-        });
-
-        $('#clear_date_filter').on('click', function () {
-            $('#booking_date_filter').val('');
-            table.draw();
-        });
-    });
-</script>
+            modal.show();
+        }
+    </script>
 @endpush

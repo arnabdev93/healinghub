@@ -50,6 +50,15 @@
                                     @endforeach
                               </select>
                            </div>
+                            <div class="col-md-2">
+                                <label><strong>Category</strong></label>
+                                <select id="category_filter" class="form-control select2-filter">
+                                        <option value="">-- All Category --</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                </select>
+                            </div>
                            <div class="col-md-2 d-flex align-items-end">
                               <!-- <button class="btn btn-primary me-2" id="filter_btn_appointment">Search</button> -->
                               <button class="btn btn-secondary" id="clear_filter_appointment">Clear</button>

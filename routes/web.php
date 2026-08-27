@@ -62,6 +62,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('doctor-earnings','Admin\UserController@doctorEarnings')->name('doctor.earnings');
     Route::get('platform-earnings','Admin\UserController@totalPlatformEarnings')->name('platform.earnings');
     Route::get('doctor-earnings/{id}/details','Admin\UserController@doctorEarningsDetails')->name('doctor.earnings.details');
+
+    Route::get('setting-manage','Admin\UserController@earningPercentage')->name('setting-manage');
+    Route::post('earning-percentage','Admin\UserController@earningPercentageUpdate')->name('earning-percentage.update');
+    Route::post('doctor/{doctor_id}/earnings-settle', 'Admin\UserController@settleDoctorEarnings')->name('doctor.earnings.settle');
     //----------------------------- Doctor Earnings ends----------------------------------------//
 
     Route::post('user-status-update', 'Admin\UserController@statusUpdate')->name('user-status-update');

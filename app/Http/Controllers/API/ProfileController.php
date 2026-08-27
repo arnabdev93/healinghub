@@ -29,7 +29,8 @@ use Illuminate\Support\Facades\DB;
 use App\Services\GoogleMeetService;
 use App\Services\MeetingService;
 use Razorpay\Api\Api;
-
+use App\Models\Setting;
+use App\Models\DoctorSettlement;
 
 
 class ProfileController extends BaseController
@@ -1452,6 +1453,63 @@ class ProfileController extends BaseController
         return $this->sendResponse([], 'Appointment cancelled successfully.');
     }
 
+    // public function calculateEarningsForDoctor(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'filter_type' => 'required|in:monthly,yearly',
+    //         'month' => 'required_if:filter_type,monthly|string',
+    //         'year' => 'required|digits:4|integer',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->sendError($validator->errors()->first());
+    //     }
+
+    //     $doctor = Auth::user();
+
+    //     if ($doctor->role !== 'doctor') {
+    //         return $this->sendError('Only doctors can access earnings.');
+    //     }
+
+    //     $query = BookAppointment::with('user')
+    //         ->where('doctor_id', $doctor->id)
+    //         ->where('status', 'completed');
+
+    //     if ($request->filter_type === 'monthly') {
+
+    //         try {
+    //             $monthNumber = Carbon::parse("1 " . $request->month)->month;
+    //         } catch (\Exception $e) {
+    //             return $this->sendError("Invalid month name.");
+    //         }
+
+    //         $query->whereMonth('booking_date', $monthNumber)
+    //             ->whereYear('booking_date', $request->year);
+    //     }
+
+    //     if ($request->filter_type === 'yearly') {
+    //         $query->whereYear('booking_date', $request->year);
+    //     }
+
+    //     $appointments = $query->orderBy('booking_date', 'desc')->get();
+
+    //     $totalAmount = $appointments->sum('amount');
+
+    //     $completedList = $appointments->map(function ($appointment) {
+    //         return [
+    //             'customer_name' => $appointment->user->name ?? 'N/A',
+    //             'appointment_date' => $appointment->booking_date,
+    //             'appointment_time' => $appointment->booking_time,
+    //             'amount' => $appointment->amount,
+    //         ];
+    //     });
+
+    //     return $this->sendResponse([
+    //         'completed_appointments' => $completedList,
+    //         'total_completed_income' => $totalAmount,
+    //         'total_completed_count' => $appointments->count()
+    //     ], "Doctor earnings fetched successfully.");
+    // }
     public function calculateEarningsForDoctor(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1470,12 +1528,13 @@ class ProfileController extends BaseController
             return $this->sendError('Only doctors can access earnings.');
         }
 
+        $monthNumber = null;
+
         $query = BookAppointment::with('user')
             ->where('doctor_id', $doctor->id)
             ->where('status', 'completed');
 
         if ($request->filter_type === 'monthly') {
-
             try {
                 $monthNumber = Carbon::parse("1 " . $request->month)->month;
             } catch (\Exception $e) {
@@ -1494,6 +1553,20 @@ class ProfileController extends BaseController
 
         $totalAmount = $appointments->sum('amount');
 
+        $earningPercentage = Setting::where('item_key', 'earning_percentage')
+            ->value('item_value') ?? 0;
+
+        $platformShare = round($totalAmount * $earningPercentage / 100, 2);
+        $doctorShare = round($totalAmount - $platformShare, 2);
+
+        $isSettled = DoctorSettlement::where('doctor_id', $doctor->id)
+            ->where('filter_type', $request->filter_type)
+            ->where('year', $request->year)
+            ->when($request->filter_type === 'monthly', function ($q) use ($monthNumber) {
+                $q->where('month', $monthNumber);
+            })
+            ->exists();
+
         $completedList = $appointments->map(function ($appointment) {
             return [
                 'customer_name' => $appointment->user->name ?? 'N/A',
@@ -1506,7 +1579,11 @@ class ProfileController extends BaseController
         return $this->sendResponse([
             'completed_appointments' => $completedList,
             'total_completed_income' => $totalAmount,
-            'total_completed_count' => $appointments->count()
+            'total_completed_count' => $appointments->count(),
+            'earning_percentage' => $earningPercentage,
+            'platform_share' => $platformShare,
+            'doctor_share' => $doctorShare,
+            'is_settled' => $isSettled,
         ], "Doctor earnings fetched successfully.");
     }
 

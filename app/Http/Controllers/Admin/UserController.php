@@ -9,10 +9,16 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\UserDetail;
 
+use App\Models\Setting;
+use App\Models\DoctorSettlement;
+use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Support\Facades\Validator;
 use App\Helpers\CustomHelper;
 use App\Models\BookAppointment;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+
 
 class UserController extends Controller
 {
@@ -24,15 +30,16 @@ class UserController extends Controller
     {
         if ($request->ajax()) {
 
-            $listQry = User::query()
-                ->select('users.*')
-                //  ->with('googleToken')
-                ->selectSub(function ($q) {
-                    $q->from('book_appointments')
-                        ->selectRaw('COALESCE(SUM(amount),0)')
-                        ->whereColumn('doctor_id', 'users.id')
-                        ->where('status', 'completed');
-                }, 'total_earnings');
+           $listQry = User::query()
+            ->select('users.*', 'categories.name as category_name')
+            ->leftJoin('user_details', 'user_details.user_id', '=', 'users.id')
+            ->leftJoin('categories', 'categories.id', '=', 'user_details.category_id')
+            ->selectSub(function ($q) {
+                $q->from('book_appointments')
+                    ->selectRaw('COALESCE(SUM(amount),0)')
+                    ->whereColumn('doctor_id', 'users.id')
+                    ->where('status', 'completed');
+            }, 'total_earnings');
 
             if ($request->type) {
                 $listQry->where('users.role', $request->type);
@@ -40,6 +47,9 @@ class UserController extends Controller
 
             if ($request->filled('user_id')) {
                 $listQry->where('users.id', $request->user_id);
+            }
+            if ($request->filled('category_id')) {
+                $listQry->where('user_details.category_id', $request->category_id);
             }
 
             // Filter by Created At Date Range
@@ -69,7 +79,9 @@ class UserController extends Controller
                 ->addColumn('total_earnings', function ($row) {
                     return '<span class="badge bg-success">₹ ' . $row->total_earnings . '</span>';
                 })
-
+                ->addColumn('category', function ($row) {
+                    return $row->category_name ?? '-';
+                })
                 ->addColumn('status', function ($row) {
 
                     if ($row->status == 1) {
@@ -101,17 +113,6 @@ class UserController extends Controller
 
                 ->addColumn('action', function ($row) {
 
-                    // $googleBtn = '';
-                    // if ($row->googleToken) {
-                    //     $googleBtn = '<span class="badge bg-success ms-1">Google Connected</span>';
-                    // } else {
-                    //     $googleBtn = '<a href="' . url('/admin/doctor/' . $row->id . '/google/connect') . '"
-                    //                     class="btn btn-sm btn-warning ms-1">
-                    //                     Connect Google
-                    //                 </a>';
-                    // }
-
-
                     return '<a class="btn btn-sm btn-secondary" href="' . route('users.edit', $row->id) . '">Edit</a>
                             <a href="'.route('doctor.earnings.details',$row->id).'" class="btn btn-sm btn-info">Details</a>';
                 })
@@ -132,6 +133,7 @@ class UserController extends Controller
                 d.start_date = $("#start_date_value").val();
                 d.end_date = $("#end_date_value").val();
                 d.user_id = $("#patient_filter").val();
+                d.category_id = $("#category_filter").val();
             }'
         ]);
 
@@ -155,7 +157,12 @@ class UserController extends Controller
                 'name' => 'users.name',
                 'title' => 'Name'
             ],
-
+            'category' => [
+                'data' => 'category',
+                'name' => 'categories.name',
+                'title' => 'Category',
+                'searchable' => false
+            ],
             'mobile' => [
                 'data' => 'mobile',
                 'name' => 'users.mobile',
@@ -193,8 +200,8 @@ class UserController extends Controller
 
         $pageName = 'Doctors';
         $pageCreateUrl = route('users.create', ['type' => 'doctor']);
-
-        return view('admin.user.index', compact('dataTable', 'pageName', 'pageCreateUrl', 'doctors'));
+        $categories = Category::select('id', 'name')->whereIn('id', [1, 2])->get();
+        return view('admin.user.index', compact('dataTable', 'pageName', 'pageCreateUrl', 'doctors','categories'));
     }
 
     public function statusUpdate(Request $request)
@@ -460,115 +467,227 @@ class UserController extends Controller
         ]);
     }
 
-    public function doctorEarningsDetails(Request $request,$doctor_id)
+    // public function doctorEarningsDetails(Request $request,$doctor_id)
+    // {
+    //     $doctor = User::with('details')->findOrFail($doctor_id);
+
+    //     if($request->ajax()){
+
+    //         $query = BookAppointment::with(['user.details'])
+    //             ->where('doctor_id',$doctor_id)
+    //             ->where('status','completed');
+
+    //         if($request->booking_date){
+    //             $query->whereDate('booking_date',$request->booking_date);
+    //         }
+
+    //         // return DataTables::of($query)
+
+    //         // ->addIndexColumn()
+
+    //         // ->addColumn('patient_name',function($row){
+    //         //     return $row->user->name ?? 'N/A';
+    //         // })
+
+    //         // ->addColumn('date',function($row){
+    //         //     return date('d-m-Y',strtotime($row->booking_date));
+    //         // })
+
+    //         // ->addColumn('call_type',function($row){
+    //         //     return ucfirst($row->appointment_type);
+    //         // })
+
+    //         // ->addColumn('amount',function($row){
+    //         //     return '<span class="badge bg-success">₹ '.$row->amount.'</span>';
+    //         // })
+
+    //         // ->rawColumns(['amount'])
+
+    //         // ->make(true);
+    //         return DataTables::of($query)
+
+    //         ->addIndexColumn()
+
+    //         ->addColumn('patient_name', function ($row) {
+    //             return $row->user->name ?? 'N/A';
+    //         })
+    //         ->filterColumn('patient_name', function ($query, $keyword) {
+    //             $query->whereHas('user', function ($q) use ($keyword) {
+    //                 $q->where('name', 'like', "%{$keyword}%");
+    //             });
+    //         })
+
+    //         ->addColumn('date', function ($row) {
+    //             return date('d-m-Y', strtotime($row->booking_date));
+    //         })
+    //         ->filterColumn('date', function ($query, $keyword) {
+    //             $query->whereRaw("DATE_FORMAT(booking_date, '%d-%m-%Y') like ?", ["%{$keyword}%"]);
+    //         })
+
+    //         ->addColumn('call_type', function ($row) {
+    //             return ucfirst($row->appointment_type);
+    //         })
+    //         ->filterColumn('call_type', function ($query, $keyword) {
+    //             $query->where('appointment_type', 'like', "%{$keyword}%");
+    //         })
+
+    //         ->addColumn('amount', function ($row) {
+    //             return '<span class="badge bg-success">₹ '.$row->amount.'</span>';
+    //         })
+
+    //         ->rawColumns(['amount'])
+
+    //         ->make(true);
+    //     }
+
+    //     $upcomingAppointments = BookAppointment::with(['user.details'])
+    //         ->where('doctor_id',$doctor_id)
+    //         ->where('status','upcoming')
+    //         ->latest()
+    //         ->limit(5)
+    //         ->get();
+
+    //     $completedAppointments = BookAppointment::with(['user.details'])
+    //         ->where('doctor_id',$doctor_id)
+    //         ->where('status','completed')
+    //         ->latest()
+    //         ->limit(5)
+    //         ->get();
+
+    //     $cancelledAppointments = BookAppointment::with(['user.details'])
+    //         ->where('doctor_id',$doctor_id)
+    //         ->where('status','cancelled')
+    //         ->latest()
+    //         ->limit(5)
+    //         ->get();
+
+    //     $builder = app('datatables.html');
+
+    //     $builder->ajax([
+    //         'url'=>route('doctor.earnings.details',$doctor_id),
+    //         'data'=>"function(d){
+    //             d.booking_date = $('#booking_date_filter').val();
+    //         }"
+    //     ]);
+
+    //     $dataTable = $builder->columns([
+    //         ['data'=>'DT_RowIndex','name'=>'id','title'=>'#','orderable'=>false,'searchable'=>false],
+    //         ['data'=>'patient_name','name'=>'patient_name','title'=>'Patient Name'],
+    //         ['data'=>'date','name'=>'booking_date','title'=>'Date'],
+    //         ['data'=>'call_type','name'=>'appointment_type','title'=>'Call Type'],
+    //         ['data'=>'amount','name'=>'amount','title'=>'Amount'],
+    //     ]);
+
+    //     return view(
+    //         'admin.doctor-profile.index',
+    //         compact(
+    //             'dataTable',
+    //             'doctor',
+    //             'upcomingAppointments',
+    //             'completedAppointments',
+    //             'cancelledAppointments'
+    //         )
+    //     );
+    // }
+    public function doctorEarningsDetails(Request $request, $doctor_id)
     {
         $doctor = User::with('details')->findOrFail($doctor_id);
 
-        if($request->ajax()){
+        $selectedMonth = (int) ($request->month ?? now()->month);
+        $selectedYear = (int) ($request->year ?? now()->year);
+
+        if ($request->ajax()) {
 
             $query = BookAppointment::with(['user.details'])
-                ->where('doctor_id',$doctor_id)
-                ->where('status','completed');
+                ->where('doctor_id', $doctor_id)
+                ->where('status', 'completed');
 
-            if($request->booking_date){
-                $query->whereDate('booking_date',$request->booking_date);
+            if ($request->month) {
+                $query->whereMonth('booking_date', $request->month);
+            }
+            if ($request->year) {
+                $query->whereYear('booking_date', $request->year);
             }
 
-            // return DataTables::of($query)
-
-            // ->addIndexColumn()
-
-            // ->addColumn('patient_name',function($row){
-            //     return $row->user->name ?? 'N/A';
-            // })
-
-            // ->addColumn('date',function($row){
-            //     return date('d-m-Y',strtotime($row->booking_date));
-            // })
-
-            // ->addColumn('call_type',function($row){
-            //     return ucfirst($row->appointment_type);
-            // })
-
-            // ->addColumn('amount',function($row){
-            //     return '<span class="badge bg-success">₹ '.$row->amount.'</span>';
-            // })
-
-            // ->rawColumns(['amount'])
-
-            // ->make(true);
             return DataTables::of($query)
-
-            ->addIndexColumn()
-
-            ->addColumn('patient_name', function ($row) {
-                return $row->user->name ?? 'N/A';
-            })
-            ->filterColumn('patient_name', function ($query, $keyword) {
-                $query->whereHas('user', function ($q) use ($keyword) {
-                    $q->where('name', 'like', "%{$keyword}%");
-                });
-            })
-
-            ->addColumn('date', function ($row) {
-                return date('d-m-Y', strtotime($row->booking_date));
-            })
-            ->filterColumn('date', function ($query, $keyword) {
-                $query->whereRaw("DATE_FORMAT(booking_date, '%d-%m-%Y') like ?", ["%{$keyword}%"]);
-            })
-
-            ->addColumn('call_type', function ($row) {
-                return ucfirst($row->appointment_type);
-            })
-            ->filterColumn('call_type', function ($query, $keyword) {
-                $query->where('appointment_type', 'like', "%{$keyword}%");
-            })
-
-            ->addColumn('amount', function ($row) {
-                return '<span class="badge bg-success">₹ '.$row->amount.'</span>';
-            })
-
-            ->rawColumns(['amount'])
-
-            ->make(true);
+                ->addIndexColumn()
+                ->addColumn('patient_name', function ($row) {
+                    return $row->user->name ?? 'N/A';
+                })
+                ->filterColumn('patient_name', function ($query, $keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', "%{$keyword}%");
+                    });
+                })
+                ->addColumn('date', function ($row) {
+                    return date('d-m-Y', strtotime($row->booking_date));
+                })
+                ->filterColumn('date', function ($query, $keyword) {
+                    $query->whereRaw("DATE_FORMAT(booking_date, '%d-%m-%Y') like ?", ["%{$keyword}%"]);
+                })
+                ->addColumn('call_type', function ($row) {
+                    return ucfirst($row->appointment_type);
+                })
+                ->filterColumn('call_type', function ($query, $keyword) {
+                    $query->where('appointment_type', 'like', "%{$keyword}%");
+                })
+                ->addColumn('amount', function ($row) {
+                    return '<span class="badge bg-success">₹ ' . $row->amount . '</span>';
+                })
+                ->rawColumns(['amount'])
+                ->make(true);
         }
 
         $upcomingAppointments = BookAppointment::with(['user.details'])
-            ->where('doctor_id',$doctor_id)
-            ->where('status','upcoming')
-            ->latest()
-            ->limit(5)
-            ->get();
+            ->where('doctor_id', $doctor_id)
+            ->where('status', 'upcoming')
+            ->latest()->limit(5)->get();
 
         $completedAppointments = BookAppointment::with(['user.details'])
-            ->where('doctor_id',$doctor_id)
-            ->where('status','completed')
-            ->latest()
-            ->limit(5)
-            ->get();
+            ->where('doctor_id', $doctor_id)
+            ->where('status', 'completed')
+            ->latest()->limit(5)->get();
 
         $cancelledAppointments = BookAppointment::with(['user.details'])
-            ->where('doctor_id',$doctor_id)
-            ->where('status','cancelled')
-            ->latest()
-            ->limit(5)
-            ->get();
+            ->where('doctor_id', $doctor_id)
+            ->where('status', 'cancelled')
+            ->latest()->limit(5)->get();
+
+        // ---- Earnings summary (month/year onujayi) ----
+        $totalAmount = BookAppointment::where('doctor_id', $doctor_id)
+            ->where('status', 'completed')
+            ->whereMonth('booking_date', $selectedMonth)
+            ->whereYear('booking_date', $selectedYear)
+            ->sum('amount');
+
+        $earningPercentage = Setting::where('item_key', 'earning_percentage')->value('item_value') ?? 0;
+        $platformShare = round($totalAmount * $earningPercentage / 100, 2);
+        $doctorShare = round($totalAmount - $platformShare, 2);
+
+        $isSettled = DoctorSettlement::where('doctor_id', $doctor_id)
+            ->where('month', $selectedMonth)
+            ->where('year', $selectedYear)
+            ->exists();
 
         $builder = app('datatables.html');
 
         $builder->ajax([
-            'url'=>route('doctor.earnings.details',$doctor_id),
-            'data'=>"function(d){
-                d.booking_date = $('#booking_date_filter').val();
+            'url' => route('doctor.earnings.details', $doctor_id),
+            'data' => "function(d){
+                d.month = " . json_encode((string) $selectedMonth) . ";
+                d.year = " . json_encode((string) $selectedYear) . ";
             }"
+        ]);
+        $builder->parameters([
+             'dom' => 'frtip',
         ]);
 
         $dataTable = $builder->columns([
-            ['data'=>'DT_RowIndex','name'=>'id','title'=>'#','orderable'=>false,'searchable'=>false],
-            ['data'=>'patient_name','name'=>'patient_name','title'=>'Patient Name'],
-            ['data'=>'date','name'=>'booking_date','title'=>'Date'],
-            ['data'=>'call_type','name'=>'appointment_type','title'=>'Call Type'],
-            ['data'=>'amount','name'=>'amount','title'=>'Amount'],
+            ['data' => 'DT_RowIndex', 'name' => 'id', 'title' => '#', 'orderable' => false, 'searchable' => false],
+            ['data' => 'patient_name', 'name' => 'patient_name', 'title' => 'Patient Name'],
+            ['data' => 'date', 'name' => 'booking_date', 'title' => 'Date'],
+            ['data' => 'call_type', 'name' => 'appointment_type', 'title' => 'Call Type'],
+            ['data' => 'amount', 'name' => 'amount', 'title' => 'Amount'],
         ]);
 
         return view(
@@ -578,8 +697,91 @@ class UserController extends Controller
                 'doctor',
                 'upcomingAppointments',
                 'completedAppointments',
-                'cancelledAppointments'
+                'cancelledAppointments',
+                'selectedMonth',
+                'selectedYear',
+                'totalAmount',
+                'earningPercentage',
+                'platformShare',
+                'doctorShare',
+                'isSettled'
             )
         );
     }
+    public function settleDoctorEarnings(Request $request, $doctor_id)
+    {
+        $request->validate([
+            'month' => 'required|integer|between:1,12',
+            'year' => 'required|digits:4|integer',
+        ]);
+
+        $alreadySettled = DoctorSettlement::where('doctor_id', $doctor_id)
+            ->where('month', $request->month)
+            ->where('year', $request->year)
+            ->exists();
+
+        if ($alreadySettled) {
+            return redirect()->back()->withErrors('Ei mash already settled.');
+        }
+
+        $totalAmount = BookAppointment::where('doctor_id', $doctor_id)
+            ->where('status', 'completed')
+            ->whereMonth('booking_date', $request->month)
+            ->whereYear('booking_date', $request->year)
+            ->sum('amount');
+        if ($totalAmount <= 0) {
+            return redirect()->back()->with(
+                'error',
+                'No earning available for the selected month and year.'
+            );
+        }
+        $earningPercentage = Setting::where('item_key', 'earning_percentage')->value('item_value') ?? 0;
+        $platformShare = round($totalAmount * $earningPercentage / 100, 2);
+        $doctorShare = round($totalAmount - $platformShare, 2);
+
+        DB::beginTransaction();
+        try {
+            $settlement = new DoctorSettlement();
+            $settlement->doctor_id = $doctor_id;
+            $settlement->month = $request->month;
+            $settlement->year = $request->year;
+            $settlement->total_amount = $totalAmount;
+            $settlement->earning_percentage = $earningPercentage;
+            $settlement->platform_share = $platformShare;
+            $settlement->doctor_share = $doctorShare;
+            $settlement->settled_at = now();
+            $settlement->settled_by = Auth::id();
+            $settlement->save();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors('Settlement failed: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Settlement done successfully.');
+    }
+    public function earningPercentage()
+    {
+        $setting = Setting::select('id', 'item_key', 'item_value')
+            ->where('item_key', 'earning_percentage')
+            ->first();
+
+        return view('admin.settings.earning', compact('setting'));
+    }
+
+    public function earningPercentageUpdate(Request $request)
+    {
+        $request->validate([
+            'earning_percentage' => 'required|numeric',
+        ]);
+
+        Setting::where('item_key', 'earning_percentage')->update([
+            'item_value' => $request->earning_percentage,
+        ]);
+
+        return redirect()->route('setting-manage')
+            ->withSuccess('Earning Percentage Updated Successfully');
+    }
+
 }
