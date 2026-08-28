@@ -992,8 +992,8 @@ class ProfileController extends BaseController
 
         $user = Auth::user();
         $query = BookAppointment::where('status', $request->query('status'))
-            ->orderBy('booking_date', 'asc')
-            ->orderBy('booking_time', 'asc');
+            ->orderBy('booking_date', 'desc')
+            ->orderBy('booking_time', 'desc');
 
         if ($user->role === 'customer') {
 
@@ -1039,7 +1039,8 @@ class ProfileController extends BaseController
         } elseif ($user->role === 'doctor') {
 
             $query->where('doctor_id', $user->id)
-                ->with(['customer:id,name']);
+                ->with(['customer:id,name',
+                'customer.details:user_id,image']);
 
             $bookings = $query->get([
                 'id',
@@ -1059,6 +1060,7 @@ class ProfileController extends BaseController
                     'appointment_id' => $booking->id,
                     'customer_id' => $booking->customer->id ?? null,
                     'customer_name' => $booking->customer->name ?? null,
+                    'customer_image'=>$booking->customer->details->image_path ?? null,
                     'booking_date' => $booking->booking_date,
                     'weekday' => $booking->weekday,
                     'slot_time' => Carbon::parse($booking->booking_time)->format('H:i'),

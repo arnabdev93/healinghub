@@ -203,10 +203,10 @@ class OrderController extends BaseController
         if ($validator->passes()) {
             $user_id = Auth::id();
 
-            $checkExists = Order::select('id')->where('user_id',$user_id)->where('status','pending')->count();
-            if($checkExists>5){
-                return $this->sendError("Prescription already uploaded");
-            }
+            // $checkExists = Order::select('id')->where('user_id',$user_id)->where('status','pending')->count();
+            // if($checkExists>5){
+            //     return $this->sendError("Prescription already uploaded");
+            // }
             $checkAddressExists = Address::select('id')->where('id',$request->address_id)->first();
             if(!$checkAddressExists){
                 return $this->sendError("Address not found");

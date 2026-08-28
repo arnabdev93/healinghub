@@ -93,6 +93,22 @@ Route::group(['middleware' => 'auth'], function () {
     //google meet
     // Route::get('/admin/doctor/{doctorId}/google/connect', [GoogleAuthController::class, 'redirectToGoogle'])->name('admin.doctor.google.connect');
     // Route::get('/admin/doctor/google/callback', [GoogleAuthController::class, 'handleCallback'])->name('admin.doctor.google.callback');
+    Route::get('/test-push', function () {
+    $helper = new \App\Helpers\FirbasePushHelper();
+
+    $deviceToken = 'e9F0IsKAT667u8ci3RnQU3:APA91bEP-OF_eYD_vCx0yKH3LXM7XJ_ylGNHE7Q0z-wgl1rN63gtcejMLs-NFrwK-neYR6UbHRiiLj3wuBHHRoWNvfn-jdFxwcz7Aeas67qlb1fjV_uH3yY';
+
+    $result = $helper->sendFribasePushNotification(
+        [$deviceToken],
+        [
+            'title' => 'Test Notification',
+            'message' => 'HealingHub push setup test successful',
+            'type' => 'test',
+        ]
+    );
+
+    return response()->json($result);
+});
 
 });
 

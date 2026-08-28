@@ -12,8 +12,80 @@ use App\Models\Banner;
 use App\Models\BookAppointment;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\BookingSlot;
+use Carbon\Carbon;
 class HomeController extends BaseController
 {
+    // public function dashboard()
+    // {
+    //     $top_doctors = $trending_categories = $categories = $banners = [];
+    //     $cart_count = 0;
+    //     $trending_categories = TrendingCategory::select('id','name','image')->where('status',1)->get();
+    //     $banners = Banner::select('id','image')->where('status',1)->get();
+    //     $categories = Category::select('id','name','image')->whereNull('parent_id')->where('status',1)->get();
+    //     $top_doctors = User::select('id', 'name')
+    //                         ->where('role', 'doctor')
+    //                         ->with(['details' => function($query) {
+    //                             $query->select('user_id', 'image', 'specialist');
+    //                         }])
+    //                         ->inRandomOrder()
+    //                         ->limit(10)
+    //                         ->get()
+    //                         ->map(function ($doctor) {
+    //                             if ($doctor->details && $doctor->details->image) {
+    //                                 $doctor->details->image = asset('storage/' . $doctor->details->image);
+    //                             }
+    //                             return $doctor;
+    //                         });
+    //     $upcoming_appointment = null;
+    //     $user = auth('api')->user();
+    //     if ($user) {
+    //         $upcoming_appointment = BookAppointment::with([
+    //                                 'user' => function($query) {
+    //                                     $query->select('id', 'name');
+    //                                 },
+    //                                 'user.details' => function($query) {
+    //                                     $query->select('user_id', 'image');
+    //                                 },
+    //                                 'doctor' => function($query) {
+    //                                     $query->select('id', 'name');
+    //                                 },
+    //                                 'doctor.details' => function($query) {
+    //                                     $query->select('user_id', 'image', 'specialist');
+    //                                 }
+    //                             ])
+    //                             ->where(function($query) use ($user) {
+    //                                 $query->where('user_id', $user->id)
+    //                                     ->orWhere('doctor_id', $user->id);
+    //                             })
+    //                             ->where('booking_date', '>=', now()->toDateString())
+    //                             ->where('status', '!=', 'cancelled')
+    //                             ->orderBy('booking_date', 'asc')
+    //                             ->orderBy('appointment_no', 'asc')
+    //                             ->first();
+    //     }
+    //     if ($upcoming_appointment) {
+
+    //         if ($upcoming_appointment->user && $upcoming_appointment->user->details) {
+    //             $img = $upcoming_appointment->user->details->image;
+    //             $upcoming_appointment->user->details->image = $img ? asset('storage/'.$img) : null;
+    //         }
+
+    //         if ($upcoming_appointment->doctor && $upcoming_appointment->doctor->details) {
+    //             $img = $upcoming_appointment->doctor->details->image;
+    //             $upcoming_appointment->doctor->details->image = $img ? asset('storage/'.$img) : null;
+    //         }
+    //     }
+    //     $result = [
+    //         'cart_count' => $cart_count,
+    //         'banners' => $banners,
+    //         'categories' => $categories,
+    //         'trending_categories' => $trending_categories,
+    //         'top_doctors' => $top_doctors,
+    //         'upcoming_appointment' => $upcoming_appointment
+    //     ];
+    //     return $this->sendResponse($result, 'Successfull');
+    // }
     public function dashboard()
     {
         $top_doctors = $trending_categories = $categories = $banners = [];
@@ -35,15 +107,19 @@ class HomeController extends BaseController
                                 }
                                 return $doctor;
                             });
+
         $upcoming_appointment = null;
+        $slotDuration = null;
         $user = auth('api')->user();
         if ($user) {
-            $upcoming_appointment = BookAppointment::with([
+            $now = now();
+
+            $candidates = BookAppointment::with([
                                     'user' => function($query) {
-                                        $query->select('id', 'name'); 
+                                        $query->select('id', 'name');
                                     },
                                     'user.details' => function($query) {
-                                        $query->select('user_id', 'image'); 
+                                        $query->select('user_id', 'image');
                                     },
                                     'doctor' => function($query) {
                                         $query->select('id', 'name');
@@ -56,13 +132,33 @@ class HomeController extends BaseController
                                     $query->where('user_id', $user->id)
                                         ->orWhere('doctor_id', $user->id);
                                 })
-                                ->where('booking_date', '>=', now()->toDateString())
+                                ->where('booking_date', '>=', $now->toDateString())
                                 ->where('status', '!=', 'cancelled')
                                 ->orderBy('booking_date', 'asc')
-                                ->orderBy('appointment_no', 'asc')
-                                ->first();
+                                ->orderBy('booking_time', 'asc')
+                                ->get();
+
+            foreach ($candidates as $appt) {
+                $duration = BookingSlot::where('user_id', $appt->doctor_id)
+                ->where('weekday', Carbon::parse($appt->booking_date)->format('l'))
+                ->value('slot_duration');
+
+                $cutoffTime = Carbon::parse($appt->booking_date . ' ' . $appt->booking_time)
+                ->addMinutes(10);
+
+                if ($cutoffTime->greaterThan($now)) {
+                    $upcoming_appointment = $appt;
+                    $slotDuration = $duration;
+                    break;
+                }
+            }
         }
+
         if ($upcoming_appointment) {
+
+            $start = Carbon::parse($upcoming_appointment->booking_time);
+            $end   = $start->copy()->addMinutes($slotDuration ?? 0);
+            $upcoming_appointment->slot_time = $start->format('H:i') . '-' . $end->format('H:i');
 
             if ($upcoming_appointment->user && $upcoming_appointment->user->details) {
                 $img = $upcoming_appointment->user->details->image;
@@ -74,6 +170,7 @@ class HomeController extends BaseController
                 $upcoming_appointment->doctor->details->image = $img ? asset('storage/'.$img) : null;
             }
         }
+
         $result = [
             'cart_count' => $cart_count,
             'banners' => $banners,
@@ -108,9 +205,9 @@ class HomeController extends BaseController
                 $qry->select('id', 'product_id', 'pack_size', 'price', 'special_price')->limit(1);
             }])
             ->select('id', 'name', 'image', 'category_id', 'status')
-            ->selectRaw("CASE 
-                WHEN LENGTH(description) > 0 
-                THEN CONCAT(SUBSTRING_INDEX(description, ' ', 15), 
+            ->selectRaw("CASE
+                WHEN LENGTH(description) > 0
+                THEN CONCAT(SUBSTRING_INDEX(description, ' ', 15),
                     IF(LENGTH(description) - LENGTH(REPLACE(description, ' ', '')) > 15, '...', ''))
                 ELSE ''
             END as description")

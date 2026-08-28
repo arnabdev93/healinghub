@@ -44,5 +44,8 @@ return [
         'secret' => env('RAZORPAY_SECRET'),
         'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
     ],
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+    ],
 
 ];
