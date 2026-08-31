@@ -12,6 +12,8 @@ use App\Models\Address;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AppointmentStatusLog;
 use Illuminate\Support\Facades\Validator;
+use App\Models\PushNotification;
+use App\Helpers\FirbasePushHelper;
 
 class AppointmentController extends Controller
 {
@@ -268,6 +270,38 @@ class AppointmentController extends Controller
             'new_status'     => $appointment->status,
             'changed_at'     => now(),
         ]);
+
+        // Push notification to customer
+        try {
+            $customer = User::find($appointment->user_id);
+
+            $statusText = $appointment->status === 'completed' ? 'completed' : 'cancelled';
+
+            $notification = new PushNotification();
+            $notification->user_id = $appointment->user_id;
+            $notification->title = 'Appointment ' . ucfirst($statusText);
+            $notification->description = 'Your appointment (' . $appointment->appointment_no . ') has been ' . $statusText . '.';
+            $notification->data = json_encode([
+                'type' => 'appointment_status_updated',
+                'appointment_id' => $appointment->id,
+                'status' => $appointment->status,
+            ]);
+            $notification->save();
+
+            if ($customer && !empty($customer->fcm_token)) {
+                $helper = new FirbasePushHelper();
+                $helper->sendFribasePushNotification(
+                    [$customer->fcm_token],
+                    [
+                        'title' => $notification->title,
+                        'message' => $notification->description,
+                        'type' => 'appointment_status_updated',
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::info("Push notification failed for appointment #{$appointment->id}: " . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

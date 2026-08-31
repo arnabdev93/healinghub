@@ -10,6 +10,8 @@ use App\Models\Address;
 use App\Models\BookAppointment;
 use App\Models\OrderItem;
 use App\Models\User;
+use App\Models\PushNotification;
+use App\Helpers\FirbasePushHelper;
 
 class OrderController extends Controller
 {
@@ -577,6 +579,43 @@ class OrderController extends Controller
 
         $order->status = $request->status;
         $order->save();
+        // Push notification to customer
+        try {
+            $customer = User::find($order->user_id);
+
+            $statusLabels = [
+                'accept'    => 'accepted',
+                'reject'    => 'rejected',
+                'delivered' => 'delivered',
+                'cancel'    => 'cancelled',
+            ];
+            $statusText = $statusLabels[$order->status] ?? $order->status;
+
+            $notification = new PushNotification();
+            $notification->user_id = $order->user_id;
+            $notification->title = 'Cart Order ' . ucfirst($statusText);
+            $notification->description = 'Your cart order #' . $order->orderno . ' has been ' . $statusText . '.';
+            $notification->data = json_encode([
+                'type' => 'order_status_updated',
+                'order_id' => $order->id,
+                'status' => $order->status,
+            ]);
+            $notification->save();
+
+            if ($customer && !empty($customer->fcm_token)) {
+                $helper = new FirbasePushHelper();
+                $helper->sendFribasePushNotification(
+                    [$customer->fcm_token],
+                    [
+                        'title' => $notification->title,
+                        'message' => $notification->description,
+                        'type' => 'order_status_updated',
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::info("Push notification failed for order #{$order->id}: " . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,
@@ -667,6 +706,41 @@ class OrderController extends Controller
             }
             $order->status=$status;
             $order->save();
+            // Push notification to customer
+            try {
+                $customer = User::find($order->user_id);
+
+                $statusLabels = [
+                    'accept' => 'accepted',
+                    'reject' => 'rejected',
+                ];
+                $statusText = $statusLabels[$order->status] ?? $order->status;
+
+                $notification = new PushNotification();
+                $notification->user_id = $order->user_id;
+                $notification->title = 'Prescription Order ' . ucfirst($statusText);
+                $notification->description = 'Your prescription order #' . $order->orderno . ' has been ' . $statusText . '.';
+                $notification->data = json_encode([
+                    'type' => 'prescription_order_status_updated',
+                    'order_id' => $order->id,
+                    'status' => $order->status,
+                ]);
+                $notification->save();
+
+                if ($customer && !empty($customer->fcm_token)) {
+                    $helper = new FirbasePushHelper();
+                    $helper->sendFribasePushNotification(
+                        [$customer->fcm_token],
+                        [
+                            'title' => $notification->title,
+                            'message' => $notification->description,
+                            'type' => 'prescription_order_status_updated',
+                        ]
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::info("Push notification failed for prescription order #{$order->id}: " . $e->getMessage());
+            }
             return response()->json(['status'=>1,'message'=>'Status Updated']);
         }else{
             return response()->json(['status'=>0,'message'=>'Order not found']);
@@ -686,6 +760,35 @@ class OrderController extends Controller
 
         $order->delivery_status = $request->delivery_status;
         $order->save();
+        // Push notification to customer
+        try {
+            $customer = User::find($order->user_id);
+
+            $notification = new PushNotification();
+            $notification->user_id = $order->user_id;
+            $notification->title = 'Prescription Order Delivered';
+            $notification->description = 'Your prescription order #' . $order->orderno . ' has been delivered.';
+            $notification->data = json_encode([
+                'type' => 'prescription_order_delivered',
+                'order_id' => $order->id,
+                'delivery_status' => $order->delivery_status,
+            ]);
+            $notification->save();
+
+            if ($customer && !empty($customer->fcm_token)) {
+                $helper = new FirbasePushHelper();
+                $helper->sendFribasePushNotification(
+                    [$customer->fcm_token],
+                    [
+                        'title' => $notification->title,
+                        'message' => $notification->description,
+                        'type' => 'prescription_order_delivered',
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::info("Push notification failed for prescription order #{$order->id}: " . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

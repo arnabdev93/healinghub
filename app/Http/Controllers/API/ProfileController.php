@@ -32,6 +32,8 @@ use Razorpay\Api\Api;
 use App\Models\Setting;
 use App\Models\DoctorSettlement;
 
+use App\Helpers\FirbasePushHelper;
+
 
 class ProfileController extends BaseController
 {
@@ -569,7 +571,8 @@ class ProfileController extends BaseController
                 'meeting_link' => $meetingLink,
                 'amount' => $amount,
                 'notes' => $request->notes,
-                'status' => 'upcoming'
+                'status' => 'upcoming',
+                'razorpay_order_id' => $request->razorpay_order_id ?? null,
             ]);
 
             $payment_method_id = PaymentMethod::where('slug', $request->payment_method)->value('id');
@@ -594,6 +597,32 @@ class ProfileController extends BaseController
             ]);
 
             DB::commit();
+            // Push notification to doctor
+            try {
+                $notification = new PushNotification();
+                $notification->user_id = $doctor->id;
+                $notification->title = 'New Appointment Booked';
+                $notification->description = 'You have a new ' . $request->appointment_type . ' appointment on ' . $request->booking_date . ' at ' . $request->booking_time;
+                $notification->data = json_encode([
+                    'type' => 'appointment_booked',
+                    'appointment_id' => $appointment->id,
+                ]);
+                $notification->save();
+
+                if (!empty($doctor->fcm_token)) {
+                    $helper = new FirbasePushHelper();
+                    $helper->sendFribasePushNotification(
+                        [$doctor->fcm_token],
+                        [
+                            'title' => $notification->title,
+                            'message' => $notification->description,
+                            'type' => 'appointment_booked',
+                        ]
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::info("Push notification failed for appointment #{$appointment->id}: " . $e->getMessage());
+            }
             return $this->sendResponse([], "Appointment booked successfully");
 
         } catch (\Exception $e) {
