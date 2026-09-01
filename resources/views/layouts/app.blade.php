@@ -53,7 +53,7 @@
 								<img class="rounded" src="{{asset('images/avatar/avatar-13.png')}}" alt="">
 							</a>
 	                            <div class="dropdown-menu" data-bs-popper="none">
-	                                <a class="dropdown-item my-5" href="#"> Profile [{{ Auth::user()->name }}]</a>
+	                                <a class="dropdown-item my-5" href="{{ route('profile') }}"> Profile [{{ Auth::user()->name }}]</a>
 	                                <a class="dropdown-item my-5" href="{{route('logout')}}"> Logout</a>
 	                            </div>
 	                        </li>

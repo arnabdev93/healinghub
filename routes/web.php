@@ -43,6 +43,8 @@ Route::get('/google/callback', [GoogleController::class, 'callback']);
 Route::group(['middleware' => 'auth'], function () {
     Route::get('home', 'HomeController@index')->name('home');
     Route::get('/chart-data/{months}', 'HomeController@getChartData')->name('chart.data');
+    Route::get('profile','HomeController@profile')->name('profile');
+    Route::post('profile-update','HomeController@profileUpdate')->name('profile-update');
     Route::get('logout', 'Auth\LoginAdminController@logout')->name('logout');
     Route::resource('banner','Admin\BannerController');
     Route::post('banner-status-update', 'Admin\BannerController@statusUpdate')->name('banner-status-update');
@@ -57,6 +59,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('product-status-update', 'Admin\ProductController@statusUpdate')->name('product-status-update');
 
     Route::resource('users','Admin\UserController');
+    Route::get('user', 'Admin\UserController@usersindex')->name('customer.index');
 
     //----------------------------- Doctor Earnings starts----------------------------------------//
     Route::get('doctor-earnings','Admin\UserController@doctorEarnings')->name('doctor.earnings');

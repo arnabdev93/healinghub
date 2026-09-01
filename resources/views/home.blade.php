@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('page_title')
-   
+
 @endsection
 @section('content')
    <!-- Home Page -->
@@ -50,8 +50,8 @@
                               <i class="fa-solid fa-hospital-user fs-24"></i>
                            </div>
                            <div>
-                              <p class="text-fade mb-5">Total Patients</p>
-                              <h1 class="my-0 fw-600">{{ $totalPatients }}</h1>     
+                              <p class="text-fade mb-5">Total Users</p>
+                              <h1 class="my-0 fw-600">{{ $totalPatients }}</h1>
                            </div>
                         </div>
                      </div>
@@ -68,7 +68,7 @@
                            </div>
                            <div>
                               <p class="text-fade mb-5">Total Doctors</p>
-                              <h1 class="my-0 fw-600">{{ $totalDoctors }}</h1>    
+                              <h1 class="my-0 fw-600">{{ $totalDoctors }}</h1>
                            </div>
                         </div>
                      </div>
@@ -85,13 +85,75 @@
                            </div>
                            <div>
                               <p class="text-fade mb-5">Total Products</p>
-                              <h1 class="my-0 fw-600">{{ $totalProducts }}</h1>      
+                              <h1 class="my-0 fw-600">{{ $totalProducts }}</h1>
                            </div>
                         </div>
                      </div>
                   </div>
                </div>
                {{-- Total appointments ends--}}
+               {{-- Upcoming appointment / pending orders row starts --}}
+         <div class="row">
+            {{-- Upcoming Appointments starts--}}
+            <div class="col-xxl-4 col-lg-6 col-12">
+               <a href="{{ route('appointments.index') }}" class="text-decoration-none">
+                  <div class="box pull-up">
+                     <div class="box-body" style="background: url('{{asset('images/svg-icon/medical/3.png')}}');  background-position: center right; background-repeat: no-repeat; background-size: 80px; margin-right: 5px;">
+                        <div class="d-flex align-items-center">
+                           <div class="me-10 bg-success w-60 h-60 rounded-circle text-center l-h-70">
+                              <i class="fa-solid fa-calendar-check fs-24"></i>
+                           </div>
+                           <div>
+                              <p class="text-fade mb-5">Upcoming Appointments</p>
+                              <h1 class="my-0 fw-600">{{ $upcomingAppointments }}</h1>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </a>
+            </div>
+            {{-- Upcoming Appointments ends--}}
+
+            {{-- Pending Cart Orders starts--}}
+            <div class="col-xxl-4 col-lg-6 col-12">
+               <a href="{{ route('cart-orders') }}" class="text-decoration-none">
+                  <div class="box pull-up">
+                    <div class="box-body" style="background: url('{{asset('images/svg-icon/medical/pendingcart.png')}}');  background-position: center right; background-repeat: no-repeat; background-size: 75px; margin-right: 5px;">
+                        <div class="d-flex align-items-center">
+                           <div class="me-10 bg-warning w-60 h-60 rounded-circle text-center l-h-70">
+                              <i class="fa-solid fa-cart-shopping fs-24"></i>
+                           </div>
+                           <div>
+                              <p class="text-fade mb-5">Pending Cart Orders</p>
+                              <h1 class="my-0 fw-600">{{ $pendingCartOrders }}</h1>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </a>
+            </div>
+            {{-- Pending Cart Orders ends--}}
+
+            {{-- Pending Prescription Orders starts--}}
+            <div class="col-xxl-4 col-lg-6 col-12">
+               <a href="{{ route('prescription-orders') }}" class="text-decoration-none">
+                  <div class="box pull-up">
+                    <div class="box-body" style="background: url('{{asset('images/svg-icon/medical/pending_presecription.jpg')}}');  background-position: center right; background-repeat: no-repeat; background-size: 80px; margin-right: 5px;">
+                        <div class="d-flex align-items-center">
+                           <div class="me-10 bg-danger w-60 h-60 rounded-circle text-center l-h-70">
+                              <i class="fa-solid fa-file-prescription fs-24"></i>
+                           </div>
+                           <div>
+                              <p class="text-fade mb-5">Pending Prescription Orders</p>
+                              <h1 class="my-0 fw-600">{{ $pendingPrescriptionOrders }}</h1>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </a>
+            </div>
+            {{-- Pending Prescription Orders ends--}}
+         </div>
             </div>
             {{-- <div class="row g-3 mb-4">
                <div class="col-md-3">
@@ -135,70 +197,64 @@
             </div> --}}
          </div>
       </div>
-      <div class="row">
-         {{-- Activity graph starts --}}
-         <div class="col-xxl-8 col-xl-7">
-             <div class="box">
-                 <div class="box-header b-0 pb-0 d-flex justify-content-between align-items-center">
-                     <h4 class="box-title">Activity</h4>
-                     <div class="dropdown">
-                        <a class="px-10 pt-5 dropdown-toggle" href="#" id="current-range-text" data-bs-toggle="dropdown">Last 6 Months</a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                           <a class="dropdown-item filter-chart" href="#" data-range="1">Last Month</a>
-                           <a class="dropdown-item filter-chart" href="#" data-range="6">Last 6 Months</a>
-                           <a class="dropdown-item filter-chart" href="#" data-range="12">Last Year</a>
+        {{-- <div class="row">
+            <div class="col-xxl-8 col-xl-7">
+                <div class="box">
+                    <div class="box-header b-0 pb-0 d-flex justify-content-between align-items-center">
+                        <h4 class="box-title">Activity</h4>
+                        <div class="dropdown">
+                            <a class="px-10 pt-5 dropdown-toggle" href="#" id="current-range-text" data-bs-toggle="dropdown">Last 6 Months</a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item filter-chart" href="#" data-range="1">Last Month</a>
+                            <a class="dropdown-item filter-chart" href="#" data-range="6">Last 6 Months</a>
+                            <a class="dropdown-item filter-chart" href="#" data-range="12">Last Year</a>
+                            </div>
                         </div>
-                     </div>
-                 </div>
-                 <div class="box-body pt-0">
-                     <div class="chart">
-                         <div id="healing-hub-main-chart"></div>
-                     </div>
-                 </div>
-             </div>
-         </div>
-         {{-- Activity graph ends --}}
-
-         {{-- Doctor success states start --}}
-         <div class="col-xxl-4 col-xl-5">
-             <div class="box">
-                 <div class="box-header b-0 d-flex justify-content-between align-items-center">
-                     <h4 class="box-title">Success Stats</h4>
-                 </div>
-                 <div class="box-body pt-0 ">
-                     <div class="table-responsive">
-                         <table class="table no-border m-0 scrollable">
-                             <tbody>
-                                 @foreach($doctorStats as $doctor)
-                                 <tr>
-                                    <td>
-                                       <div class="me-2">
-                                          <img src="{{ $doctor->details->image ? asset('storage/'.$doctor->details->image) : asset('images/avatar/avatar-13.png') }}" class="avatar avatar-sm rounded10">
-                                       </div>
-                                       <div class="d-flex flex-column">
-                                          <a class="text-dark fs-10">{{ $doctor->name }}</a>
-                                       </div>
-                                    </td>
-                                    <td>
-                                       <div class="progress" style="height:7px;width:200px">
-                                          <div class="progress-bar bg-primary" style="width: {{ min($doctor->completed_appointments*10,100) }}%">
-                                          </div>
-                                       </div>
-                                    </td>
-                                    <td>{{ $doctor->completed_appointments }}</td>
-                                 </tr>
-                                 @endforeach
-                             </tbody>
-                         </table>
-                     </div>
-                 </div>
-             </div>
-         </div>
-         {{-- Doctor success states ends --}}
-      </div>
-      <div class="row">
+                    </div>
+                    <div class="box-body pt-0">
+                        <div class="chart">
+                            <div id="healing-hub-main-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-4 col-xl-5">
+                <div class="box">
+                    <div class="box-header b-0 d-flex justify-content-between align-items-center">
+                        <h4 class="box-title">Success Stats</h4>
+                    </div>
+                    <div class="box-body pt-0 ">
+                        <div class="table-responsive">
+                            <table class="table no-border m-0 scrollable">
+                                <tbody>
+                                    @foreach($doctorStats as $doctor)
+                                    <tr>
+                                        <td>
+                                        <div class="me-2">
+                                            <img src="{{ $doctor->details->image ? asset('storage/'.$doctor->details->image) : asset('images/avatar/avatar-13.png') }}" class="avatar avatar-sm rounded10">
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <a class="text-dark fs-10">{{ $doctor->name }}</a>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="progress" style="height:7px;width:200px">
+                                            <div class="progress-bar bg-primary" style="width: {{ min($doctor->completed_appointments*10,100) }}%">
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>{{ $doctor->completed_appointments }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
          <div class="col-xxl-4 col-xl-4">
-            {{-- Doctor list starts --}}
             <div class="box">
                <div class="box-header b-0 d-flex justify-content-between align-items-center">
                   <h4 class="box-title">Doctor List</h4>
@@ -219,14 +275,12 @@
                   </div>
                </div>
             </div>
-            {{-- Doctor list ends --}}
          </div>
          <div class="col-xxl-8 col-xl-8">
             <div class="box">
                <div class="box-header b-0 d-flex justify-content-between align-items-center">
                   <h4 class="box-title">Appointments</h4>
                </div>
-               {{-- Appointments list starts --}}
                <div class="box-body pt-0">
                   <div class="table-responsive">
                      <table class="table m-0 scrollable">
@@ -255,10 +309,9 @@
                      </table>
                   </div>
                </div>
-               {{-- Appointments list ends --}}
             </div>
          </div>
-      </div>
+      </div> --}}
    </section>
 @endsection
 @push('page_scripts')
@@ -295,11 +348,11 @@
             categories: chartMonths
          },
          yaxis: [
-            { 
-               title: { text: 'Appointments' } 
+            {
+               title: { text: 'Appointments' }
             },
-            { 
-               opposite: true, 
+            {
+               opposite: true,
                title: { text: 'Earnings' },
                labels: {
                      formatter: function (value) {
@@ -322,10 +375,10 @@
 
       $('.filter-chart').on('click', function(e) {
          e.preventDefault();
-         
+
          var range = $(this).data('range');
          var rangeText = $(this).text();
-      
+
          $('#current-range-text').text(rangeText);
          $.ajax({
             url: "{{ url('chart-data') }}/" + range,

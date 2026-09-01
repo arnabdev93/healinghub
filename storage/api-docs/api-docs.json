@@ -574,6 +574,133 @@
                 }
             }
         },
+        "/healinghub/api/trending-products": {
+            "get": {
+                "tags": [
+                    "Customer API"
+                ],
+                "summary": "Product Lists",
+                "description": "Get product list with category, subcategory, and search filter",
+                "operationId": "f593c19cd411abd16f508dd4ab3c56b2",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Trending Category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of products per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Paracetamol Tablet"
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/storage/product.jpg"
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Short product description..."
+                                                            },
+                                                            "prices": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "product_id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "pack_size": {
+                                                                            "type": "string",
+                                                                            "example": "10 tablets"
+                                                                        },
+                                                                        "price": {
+                                                                            "type": "number",
+                                                                            "example": 100
+                                                                        },
+                                                                        "special_price": {
+                                                                            "type": "number",
+                                                                            "example": 80
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/healinghub/api/products/{id}": {
             "get": {
                 "tags": [
@@ -657,6 +784,11 @@
                                         "description": "specialist",
                                         "type": "string",
                                         "example": "Homeopathy"
+                                    },
+                                    "about": {
+                                        "description": "about For Doctor Only",
+                                        "type": "string",
+                                        "example": "Doctor About"
                                     },
                                     "age": {
                                         "description": "Age required for Customer",

@@ -319,6 +319,75 @@ class BaseController extends Controller
     *         )
     *     )
     * )
+    * @OA\Get(
+    *     path="/healinghub/api/trending-products",
+    *     tags={"Customer API"},
+    *     summary="Product Lists",
+    *     description="Get product list with category, subcategory, and search filter",
+    *
+    *     @OA\Parameter(
+    *         name="category_id",
+    *         in="query",
+    *         description="Trending Category ID",
+    *         required=false,
+    *         @OA\Schema(type="integer", example=1)
+    *     ),
+    *     @OA\Parameter(
+    *         name="per_page",
+    *         in="query",
+    *         description="Number of products per page",
+    *         required=false,
+    *         @OA\Schema(type="integer", example=20)
+    *     ),
+    *
+    *     @OA\Response(
+    *         response=200,
+    *         description="Successful",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="success", type="boolean", example=true),
+    *             @OA\Property(property="message", type="string", example="Successful"),
+    *             @OA\Property(
+    *                 property="data",
+    *                 type="object",
+    *
+    *                 @OA\Property(
+    *                     property="current_page",
+    *                     type="integer",
+    *                     example=1
+    *                 ),
+    *
+    *                 @OA\Property(
+    *                     property="data",
+    *                     type="array",
+    *                     @OA\Items(
+    *                         type="object",
+    *                         @OA\Property(property="id", type="integer", example=1),
+    *                         @OA\Property(property="name", type="string", example="Paracetamol Tablet"),
+    *                         @OA\Property(property="image", type="string", example="http://example.com/storage/product.jpg"),
+    *                         @OA\Property(property="category_id", type="integer", example=2),
+    *                         @OA\Property(property="description", type="string", example="Short product description..."),
+    *
+    *                         @OA\Property(
+    *                             property="prices",
+    *                             type="array",
+    *                             @OA\Items(
+    *                                 type="object",
+    *                                 @OA\Property(property="id", type="integer", example=1),
+    *                                 @OA\Property(property="product_id", type="integer", example=1),
+    *                                 @OA\Property(property="pack_size", type="string", example="10 tablets"),
+    *                                 @OA\Property(property="price", type="number", example=100),
+    *                                 @OA\Property(property="special_price", type="number", example=80)
+    *                             )
+    *                         )
+    *                     )
+    *                 ),
+    *
+    *                 @OA\Property(property="per_page", type="integer", example=20),
+    *                 @OA\Property(property="total", type="integer", example=100)
+    *             )
+    *         )
+    *     )
+    * )
      * @OA\Get(
      * path="/healinghub/api/products/{id}",
      * tags={"Customer API"},
@@ -364,6 +433,12 @@ class BaseController extends Controller
      *                    type="string",
      *                    description="specialist",
      *                    example="Homeopathy"
+     *                 ),
+     *                  @OA\Property(
+     *                    property="about",
+     *                    type="string",
+     *                    description="about For Doctor Only",
+     *                    example="Doctor About"
      *                 ),
      *                 @OA\Property(
      *                     property="age",type="string",description="Age required for Customer",example="34"

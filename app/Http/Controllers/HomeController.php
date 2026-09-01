@@ -13,6 +13,9 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\TrendingCategory;
 use App\Models\Order;
+use Auth;
+use Storage;
+use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
 {
@@ -45,7 +48,7 @@ class HomeController extends Controller
         $startDate = Carbon::now()->subMonths(5)->startOfMonth();
         $results = BookAppointment::where('created_at', '>=', $startDate)
             ->selectRaw('
-                MONTHNAME(created_at) as month_name, 
+                MONTHNAME(created_at) as month_name,
                 MONTH(created_at) as month_num,
                 COUNT(*) as total_appointments,
                 SUM(amount) as total_earnings
@@ -61,7 +64,7 @@ class HomeController extends Controller
             $monthShort = Carbon::now()->subMonths($i)->format('M');
 
             $data = $results->get($monthName);
-            
+
             $activityData[] = [
                 'month' => $monthShort,
                 'total' => $data ? $data->total_appointments : 0,
@@ -123,6 +126,16 @@ class HomeController extends Controller
         // Prescription Orders
         $prescriptionOrders = Order::where('type', 'prescription')->count();
 
+        // Upcoming Appointments
+        $upcomingAppointments = BookAppointment::where('status', 'upcoming')->count();
+
+        // Pending Cart Orders
+        $pendingCartOrders = Order::where('type', 'cart')->where('status', 'pending')->count();
+
+        // Pending Prescription Orders
+        $pendingPrescriptionOrders = Order::where('type', 'prescription')->where('status', 'pending')->count();
+
+
         return view('home',compact(
             'newDoctors',
             'newPatients',
@@ -140,6 +153,9 @@ class HomeController extends Controller
             'totalTrendingCategories',
             'cartOrders',
             'prescriptionOrders',
+            'upcomingAppointments',
+            'pendingCartOrders',
+            'pendingPrescriptionOrders'
         ));
     }
 
@@ -149,9 +165,9 @@ class HomeController extends Controller
 
         $results = BookAppointment::where('created_at', '>=', $startDate)
             ->selectRaw('
-                MONTHNAME(created_at) as month_name, 
-                MONTH(created_at) as month_num, 
-                COUNT(*) as total_apps, 
+                MONTHNAME(created_at) as month_name,
+                MONTH(created_at) as month_num,
+                COUNT(*) as total_apps,
                 SUM(amount) as total_earnings
             ')
             ->groupBy('month_num', 'month_name')
@@ -181,5 +197,34 @@ class HomeController extends Controller
             'appointments' => $appointmentData,
             'earnings' => $earningsData
         ]);
+    }
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('profile',compact('user'));
+    }
+    public function profileUpdate(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required',
+            // 'email' => 'required|email|unique:users,email,'.$user->id,
+            'password' => 'nullable|min:8',
+            // 'image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif'
+        ]);
+
+        // if($request->hasFile('image')){
+        //     if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+        //         Storage::disk('public')->delete($user->profile_image);
+        //     }
+        //     $user->profile_image = $request->image->store('profile', 'public');
+        // }
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if($request->password){
+            $user->password = Hash::make($request->password);
+        }
+        $user->save();
+        return redirect()->route('profile')->withSuccess('Profile Updated');
     }
 }

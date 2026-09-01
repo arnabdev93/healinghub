@@ -16,6 +16,7 @@ Route::get('dashboard','HomeController@dashboard');
 Route::get('sub-categories','HomeController@subCategories');
 Route::get('products','HomeController@products');
 Route::get('products/{id}','HomeController@productDetails');
+Route::get('trending-products', 'HomeController@trendingProducts');
 Route::get('get-doctors/{category_id}', 'ProfileController@getDoctors');
 Route::get('show-doctor/{doctor_id}', 'ProfileController@showDoctor');
 Route::post('get-avalable-slots', 'ProfileController@getAvalableSlots');

@@ -28,7 +28,7 @@
 
                     <div class="form-group mb-3" style="max-width: 400px;">
                         <label class="form-label">
-                            <strong>Earning Percentage</strong>
+                            <strong>Earning Percentage From Doctor</strong>
                         </label>
                         <input type="number" step="0.01" name="earning_percentage" class="form-control"
                             value="{{ old('earning_percentage', $setting->item_value ?? '') }}"

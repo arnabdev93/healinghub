@@ -89,6 +89,7 @@ class ProfileController extends BaseController
                 'name' => 'required|min:3',
                 'category_id' => 'required|in:1,2',
                 'specialist' => 'nullable|string',
+                'about' => 'nullable|string|max:1000',
                 'bank_name' => 'nullable|required_with:bank_ifsc_code,bank_acc_no',
                 'bank_acc_no' => 'nullable|required_with:bank_name,bank_ifsc_code',
                 'bank_ifsc_code' => 'nullable|required_with:bank_name,bank_acc_no',
@@ -102,13 +103,20 @@ class ProfileController extends BaseController
 
             $details = UserDetail::where('user_id',$user_id)->first();
             if($role=='doctor'){
+                // $details->category_id = $request->category_id;
+                // $details->specialist = $request->specialist;
+                // $details->bank_name = $request->bank_name;
+                // $details->bank_acc_no = $request->bank_acc_no;
+                // $details->bank_ifsc_code = $request->bank_ifsc_code;
+                // $details->upi = $request->upi;
+                // $details->about = $request->about;
                 $details->category_id = $request->category_id;
-                $details->specialist = $request->specialist;
-                $details->bank_name = $request->bank_name;
-                $details->bank_acc_no = $request->bank_acc_no;
-                $details->bank_ifsc_code = $request->bank_ifsc_code;
-                $details->upi = $request->upi;
-                $details->about = $request->about;
+                $details->specialist = $request->specialist ?? $details->specialist;
+                $details->bank_name = $request->bank_name ?? $details->bank_name;
+                $details->bank_acc_no = $request->bank_acc_no ?? $details->bank_acc_no;
+                $details->bank_ifsc_code = $request->bank_ifsc_code ?? $details->bank_ifsc_code;
+                $details->upi = $request->upi ?? $details->upi;
+                $details->about = $request->about ?? $details->about;
                 if($request->hasFile('image')){
                     if($details->image){
                         CustomHelper::removeExistingFileFromStorage($details->image);//This is a helper function
@@ -119,9 +127,12 @@ class ProfileController extends BaseController
                 $details->gender = $request->gender;
                 $details->age = $request->age;
                 $details->weight = $request->weight;
-                $details->heart_rate = $request->heart_rate;
-                $details->bp = $request->bp;
-                $details->calories = $request->calories;
+                // $details->heart_rate = $request->heart_rate;
+                // $details->bp = $request->bp;
+                // $details->calories = $request->calories;
+                $details->heart_rate = $request->heart_rate ?? $details->heart_rate;
+                $details->bp = $request->bp ?? $details->bp;
+                $details->calories = $request->calories ?? $details->calories;
                 if($request->hasFile('image')){
                     if($details->image){
                         CustomHelper::removeExistingFileFromStorage($details->image);//This is a helper function

@@ -256,4 +256,46 @@ class HomeController extends BaseController
         ];
         return $this->sendResponse($result, 'Successfull');
     }
+    public function trendingProducts(Request $request)
+    {
+        if (!$request->filled('category_id')) {
+            return $this->sendResponse(null, 'category id is required');
+        }
+
+        $perPage = $request->input('per_page', 40);
+        $url = asset('storage/');
+
+        $productQry = Product::with(['prices' => function($qry) {
+                $qry->select('id', 'product_id', 'pack_size', 'price', 'special_price')->limit(1);
+            }])
+            ->select('id', 'name', 'image', 'category_id', 'status')
+            ->selectRaw("CASE
+                WHEN LENGTH(description) > 0
+                THEN CONCAT(SUBSTRING_INDEX(description, ' ', 15),
+                    IF(LENGTH(description) - LENGTH(REPLACE(description, ' ', '')) > 15, '...', ''))
+                ELSE ''
+            END as description")
+            ->where('status', 1)
+            ->whereHas('trending_categories', function ($qry) use ($request) {
+                $qry->where('categories.id', $request->category_id);
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $productQry->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $products = $productQry->orderBy('id', 'DESC')->paginate($perPage);
+
+        $products->getCollection()->transform(function ($product) use ($url) {
+            $product->image = $product->image ? $url . '/' . $product->image : asset('images/default-product.png');
+            return $product;
+        });
+
+        $result = $products->toArray();
+
+        return $this->sendResponse($result, 'Successful');
+    }
 }

@@ -784,4 +784,95 @@ class UserController extends Controller
             ->withSuccess('Earning Percentage Updated Successfully');
     }
 
+
+    public function usersindex(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $listQry = User::query()
+                ->select('users.*')
+                ->leftJoin('user_details', 'user_details.user_id', '=', 'users.id')
+                ->where('users.role', 'customer');
+
+            if ($request->filled('user_id')) {
+                $listQry->where('users.id', $request->user_id);
+            }
+
+            $lists = $listQry->orderBy('users.id', 'DESC');
+
+            return DataTables::of($lists)
+                ->addColumn('image', function ($row) {
+                    $user_detail = UserDetail::select('image')->where('user_id', $row->id)->first();
+
+                    if ($user_detail && $user_detail->image) {
+                        return '<a href="' . asset('storage/' . $user_detail->image) . '" target="_blank">
+                                <img src="' . asset('storage/' . $user_detail->image) . '" width="50" class="img-rounded" />
+                                </a>';
+                    }
+
+                    return '<img src="' . asset('images/no-image.png') . '" width="50">';
+                })
+                ->addColumn('mobile', function ($row) {
+                    return $row->mobile ?? '-';
+                })
+                ->addColumn('created_at', function ($row) {
+                    return date('Y-m-d g:i a', strtotime($row->created_at));
+                })
+                ->rawColumns(['image'])
+                ->toJson();
+        }
+
+        $url = url('user');
+
+        $builder = app('datatables.html');
+
+        $builder->ajax([
+            'url' => $url,
+            'data' => 'function(d) {
+                d.start_date = $("#start_date_value").val();
+                d.end_date = $("#end_date_value").val();
+            }'
+        ]);
+
+        $builder->parameters([
+            'lengthChange' => false,
+            'searching' => true,
+            'stateSave' => true,
+            'deferLoading' => 0
+        ]);
+
+        $dataTable = $builder->columns([
+            'image' => [
+                'data' => 'image',
+                'name' => 'image',
+                'title' => 'Image',
+                'searchable' => false
+            ],
+            'name' => [
+                'data' => 'name',
+                'name' => 'users.name',
+                'title' => 'Name'
+            ],
+            'email' => [
+                'data' => 'email',
+                'name' => 'users.email',
+                'title' => 'Email'
+            ],
+            'mobile' => [
+                'data' => 'mobile',
+                'name' => 'users.mobile',
+                'title' => 'Mobile'
+            ],
+            'created_at' => [
+                'data' => 'created_at',
+                'name' => 'users.created_at',
+                'title' => 'CreatedAt'
+            ],
+        ]);
+
+        $pageName = 'Users';
+        $pageCreateUrl = null;
+
+        return view('admin.user.userindex', compact('dataTable', 'pageName', 'pageCreateUrl'));
+    }
 }
