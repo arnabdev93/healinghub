@@ -50,7 +50,8 @@
 							<span>Products</span>
 						</a>
 					</li>
-                    <li class="{{ Route::is('customer.index')}}">
+                    {{-- <li class="{{ Route::is('customer.index')}}"> --}}
+                    <li class="{{ Route::is('customer.index') ? 'active' : ''}}">
 						<a href="{{route('customer.index')}}">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
 								<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -72,7 +73,9 @@
 							<span>Doctors</span>
 						</a>
 					</li>
-					<li class="treeview {{ Route::is('prescription-orders') ? 'menu-open' : (Route::is('prescription-orders.show') ? 'menu-open' : '') }}">
+					<li class="treeview {{
+                        Route::is('cart-orders') || Route::is('prescription-orders') || Route::is('prescription-orders.show')
+                        ? 'menu-open' : '' }}">
 					   <a href="#">
 					      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
@@ -82,8 +85,11 @@
 					      	<i class="fa fa-angle-right pull-right"></i>
 					      </span>
 					   </a>
-					   <ul class="treeview-menu {{ Route::is('prescription-orders') ? 'active' : (Route::is('prescription-orders.show') ? 'active' : '') }}" style="{{ Route::is('prescription-orders') ? 'display:block;' : (Route::is('prescription-orders.show') ? 'display:block;' : '') }}">
-							<li>
+					   <ul class="treeview-menu {{
+                            Route::is('cart-orders') || Route::is('prescription-orders') || Route::is('prescription-orders.show')
+                            ? 'active' : '' }}"
+                        style="{{Route::is('cart-orders') || Route::is('prescription-orders') || Route::is('prescription-orders.show') ? 'display:block;' : ''}}">
+							<li class="{{ Route::is('cart-orders') ? 'active' : '' }}">
 								<a href="{{route('cart-orders')}}">
 									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="9" cy="21" r="1"></circle>
@@ -96,7 +102,7 @@
 									<span class="">Cart Orders</span>
 								</a>
 							</li>
-					      	<li>
+					      	<li class="{{ Route::is('prescription-orders') || Route::is('prescription-orders.show') ? 'active' : '' }}">
 								<a href="{{route('prescription-orders')}}">
 									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<circle cx="9" cy="21" r="1"></circle>
